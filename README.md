@@ -23,3 +23,5 @@ pip3 install -r requirements
 ```
 
 More coming...
+
+Made by Ole and Eirik

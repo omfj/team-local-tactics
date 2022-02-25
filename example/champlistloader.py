@@ -1,5 +1,7 @@
 from core import Champion
+import os
 
+cwd = os.getcwd()
 
 def _parse_champ(champ_text: str) -> Champion:
     name, rock, paper, scissors = champ_text.split(sep=',')
@@ -16,4 +18,4 @@ def from_csv(filename: str) -> dict[str, Champion]:
 
 
 def load_some_champs():
-    return from_csv('some_champs.txt')
+    return from_csv(cwd + '/some_champs.txt')

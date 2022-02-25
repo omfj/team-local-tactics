@@ -13,6 +13,7 @@ Rock, paper, scissors with a twist! Choose between the different champions and c
 git clone https://github.com/omfj/team-local-tactics.git
 ```
 
+2. CD into the directory
 ```bash
 cd team-local-tactics
 ```
@@ -20,14 +21,14 @@ cd team-local-tactics
 ### Docker
 Make sure you have docker downloaded. Then...
 
-2. Build the image
+3. Build the image
 ```bash
 docker build --tag team-local-tactics .
 ```
 
-3. Run the container
+4. Run the container
 ```bash
-docker run -it tlt:latest
+docker run -it team-local-tactics:latest
 ```
 
 Made by [Ole Magnus](https://github.com/omfj) and [Eirik](https://github.com/eirikbe01)

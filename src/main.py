@@ -1,12 +1,11 @@
-import json
 from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
-import os
-import sys
 from game import Champion, Match, Shape, Team
 from commands import help_message, get_match_history, error_command, clear_screen, restart, welcome_message
 from commands import TITLE, T_H_CLR, T_B_CLR, TXT_CLR, ERR_CLR, P1_CLR, P2_CLR, PROMPT
+import os
+import json
 
 console = Console()
 prompt = Prompt()

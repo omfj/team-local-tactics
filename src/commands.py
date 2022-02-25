@@ -1,11 +1,15 @@
 from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
+import json
 import os
 import sys
 
 console = Console()
 prompt = Prompt()
+
+# Get the current working directory
+cwd = os.getcwd()
 
 # Color variables
 TITLE = "bold blue"

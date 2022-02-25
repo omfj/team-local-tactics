@@ -1,6 +1,7 @@
 from core import Champion
-import os
 
+# Added os for testing
+import os
 cwd = os.getcwd()
 
 def _parse_champ(champ_text: str) -> Champion:
@@ -18,4 +19,5 @@ def from_csv(filename: str) -> dict[str, Champion]:
 
 
 def load_some_champs():
+    # Added cwd for testing
     return from_csv(cwd + '/some_champs.txt')

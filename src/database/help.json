@@ -1,0 +1,51 @@
+[
+    {
+        "name": "start",
+        "description": "Starts a game",
+        "alias": [
+            "s"
+        ]
+    },
+    {
+        "name": "help",
+        "description": "Displays this message!",
+        "alias": [
+            "h"
+        ]
+    },
+    {
+        "name": "history",
+        "description": "Displays the history of previous games.",
+        "alias": [
+
+        ]
+    },
+    {
+        "name": "champions",
+        "description": "Dispays all the champions.",
+        "alias": [
+            "champs"
+        ]
+    },
+    {
+        "name": "clear",
+        "description": "Clears the screen of text.",
+        "alias": [
+            
+        ]
+    },
+    {
+        "name": "restart",
+        "description": "Restarts the program.",
+        "alias": [
+            
+        ]
+    },
+    {
+        "name": "exit",
+        "description": "Exits the program.",
+        "alias": [
+            "e"
+        ]
+    }
+]

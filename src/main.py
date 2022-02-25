@@ -2,10 +2,13 @@ import json
 import yaml
 from rich.table import Table
 from rich.console import Console
+from rich.prompt import Prompt
+from rich.style import Style
 import os
 import sys
 
 console = Console()
+prompt = Prompt()
 cwd = os.getcwd()
 
 # Load settings
@@ -140,7 +143,7 @@ commands = {
     "help": help_message,
     "h": help_message,
 
-    # Get match history
+    # Get match history TODO
     "his": get_match_history,
     "history": get_match_history,
 
@@ -153,23 +156,18 @@ commands = {
     
     # Restart
     "restart": restart,
-
-    # Exit
-    "exit": exit,
-    "e": exit,
 }
-
 
 if __name__ == "__main__":
     welcome_message()
-    while (command := input(f"{PROMPT} ").lower()):
+    while (command := input(f"{PROMPT} ").lower()) != "e":
         # Print for empty space
         print()
         
         # Check if the command is in the commands dictionary
         if command in commands:
             commands[command]()
-        elif command == "exit":
+        elif command == "exit" or "e":
             console.print("Goodbye!", style="bold green")
             break
         else:

@@ -22,7 +22,7 @@ Make sure you have docker downloaded. Then...
 
 Build the image
 ```bash
-docker build --tag tlt .
+docker build --tag team-local-tactics .
 ```
 
 Run the container

@@ -27,7 +27,7 @@ docker build --tag team-local-tactics .
 
 Run the container
 ```bash
-docker run --name team-local-tactics
+docker run team-local-tactics
 ```
 
 Made by [Ole Magnus](https://github.com/omfj) and [Eirik](https://github.com/eirikbe01)

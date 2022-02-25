@@ -19,9 +19,9 @@ cd team-local-tactics
 
 Download the required dependencies
 ```bash
-pip3 install -r requirements
+pip3 install -r requirements.txt
 ```
 
 More coming...
 
-Made by Ole and Eirik
+Made by [Ole Magnus](https://github.com/omfj) and [Eirik](https://github.com/eirikbe01)

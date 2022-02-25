@@ -86,12 +86,14 @@ def get_champions():
     except Exception as e:
         console.print(f"Error with champions.json: {e}", style=ERR_CLR)
 
+
 def get_match_history():
     # Make the table title and headers
     table = Table(title="📚 Match History 📚", header_style=T_H_CLR)
     table.add_column("Player 1", justify="left", style=T_B_CLR)
     table.add_column("Player 2", justify="left", style=T_B_CLR)
     table.add_column("Played", justify="left", style=T_B_CLR)
+
 
 class Error:
     def command(command):
@@ -118,13 +120,23 @@ def clear_screen():
     else:
         console.print("Could not clear the screen.", style=ERR_CLR)
 
+
 def restart():
     console.print("Restarting...", style="green", end="")
     
     # Restartes program
     os.execv(sys.executable, ['python3'] + sys.argv)
 
+
+def start():
+    pass
+
+
 commands = {
+    # Start game TODO
+    "start": start,
+    "s": start,
+
     # Get help
     "help": help_message,
     "h": help_message,
@@ -142,7 +154,12 @@ commands = {
     
     # Restart
     "restart": restart,
+
+    # Exit
+    "exit": exit,
+    "e": exit,
 }
+
 
 if __name__ == "__main__":
     welcome_message()

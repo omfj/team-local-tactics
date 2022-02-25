@@ -1,11 +1,3 @@
-import yaml
-import os
+import random
 
-cwd = os.getcwd()
-
-# Load settings
-with open(cwd + '/src/settings.yaml', 'r') as settings_file:
-    settings = yaml.load(settings_file, Loader=yaml.FullLoader)
-    print(settings)
-
-settings_file.close()
+print(random.randint(1, 100))

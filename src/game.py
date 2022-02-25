@@ -10,18 +10,6 @@ _BEATS = {
 
 
 class Shape(Enum):
-    """
-    Hand shapes for the Rock paper scissors game.
-
-    Support the comparisson of two shapes to infer the one that wins.
-
-    Example
-    -------
-    >>> Shape.ROCK > Shape.PAPER 
-    False
-    >>> Shape.ROCK < Shape.PAPER
-    True
-    """
     ROCK = 1
     PAPER = 2
     SCISSORS = 3
@@ -32,35 +20,13 @@ class Shape(Enum):
 
 @dataclass
 class PairThrow:
-    """
-    Store the pair of shapes in a throw.
-    """
     red: Shape
     blue: Shape
 
 
 class Champion:
-    """
-    Champion for the game Rock paper scissors. Store the name and the
-    probabilities of throwing each shape.
 
-    Parameters
-    ----------
-    name : str
-        The name of the champion.
-    rock : float
-        The probability of throwing rock. Must be between 0 and 1. 
-    paper : float
-        The probability of throwing paper. Must be between 0 and 1.
-    scissors : float
-        The probability of throwing scissors. Must be between 0 and 1.
-
-    Note
-    ----
-    Probabilities are stored after dividing by the sum of them.
-    """
-
-    def __init__(self, name: str, rock: float = 1, paper: float = 1, scissors: float = 1):
+    def __init__(self, name, rock = 1, paper= 1, scissors = 1):
         self._name = name
         total = rock + paper + scissors
         self._rock = rock / total
@@ -79,19 +45,7 @@ class Champion:
         return Shape.SCISSORS
 
     @property
-    def str_tuple(self) -> tuple[str, str, str, str]:
-        """
-        A tuple with strings describing the champion.
-
-        Returns
-        -------
-        tuple
-
-        Example
-        -------
-        >>> Champion("John").str_tuple
-        ('John','0.33','0.33','0.33')
-        """
+    def str_tuple(self):
         return (self.name,
                 f'{self._rock:.2f}',
                 f'{self._paper:.2f}',
@@ -102,21 +56,7 @@ class Champion:
                 f'{self._paper:.2f}   |   {(1-self._rock-self._paper):.2f}')
 
 
-def pair_throw(red_champ: Champion,
-               blue_champ: Champion,
-               max_iter: int = 100) -> PairThrow:
-    """
-    Red and blue champions throw at the same time.
-
-    Parameters
-    ----------
-    red_champ : Champion
-        Red champion.
-    blue_champ : Champion
-        Blue champion.
-    max_iter : int, default 100
-        Maximun number of interations before calling a draw.
-    """
+def pair_throw(red_champ, blue_champ,  max_iter = 100):
 
     for _ in range(max_iter):
         red_throw = red_champ.throw()
@@ -128,34 +68,15 @@ def pair_throw(red_champ: Champion,
 
 @dataclass
 class Team:
-    """
-    Team consisting in a list of champions.
-
-    Support interating over the team. Each time the iteration begins 
-    the list of champions is shuffled.
-    """
-
     champions: list[Champion]
 
-    def __iter__(self) -> list[Champion]:
+    def __iter__(self):
         shuffle(self.champions)
         return iter(self.champions)
 
 
 @dataclass
 class Match:
-    """
-    Match results between two teams.
-
-    Parameters
-    ----------
-    red_team: Team
-        The red team.
-    blue_team: Team
-        The blue team.
-    n_rounds: int, default 3
-        Number of rounds to be played.
-    """
     red_team: Team
     blue_team: Team
     n_rounds: int = 3

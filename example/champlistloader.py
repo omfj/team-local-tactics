@@ -4,12 +4,12 @@ from core import Champion
 import os
 cwd = os.getcwd()
 
-def _parse_champ(champ_text: str) -> Champion:
+def _parse_champ(champ_text):
     name, rock, paper, scissors = champ_text.split(sep=',')
     return Champion(name, float(rock), float(paper), float(scissors))
 
 
-def from_csv(filename: str) -> dict[str, Champion]:
+def from_csv(filename)
     champions = {}
     with open(filename, 'r') as f:
         for line in f.readlines():
@@ -19,5 +19,4 @@ def from_csv(filename: str) -> dict[str, Champion]:
 
 
 def load_some_champs():
-    # Added cwd for testing
     return from_csv(cwd + '/some_champs.txt')

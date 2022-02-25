@@ -9,10 +9,10 @@ import sys
 
 console = Console()
 prompt = Prompt()
-cwd = os.getcwd()
+# cwd = os.getcwd()
 
 # Load settings
-with open(cwd + "/src/settings.yaml") as settings_file:
+with open("settings.yaml") as settings_file:
     settings = yaml.load(settings_file, Loader=yaml.FullLoader)
 try:
     TITLE = settings["colors"]["title"]
@@ -54,7 +54,7 @@ def help_message():
     
     # Opens the help file and reads it
     try:
-        with open(cwd + "/src/database/help.json") as f:
+        with open("database/help.json") as f:
             commands = json.load(f)
             for command in commands:
                 name, description, alias = command["name"], command["description"], command["alias"]
@@ -74,7 +74,7 @@ def get_champions():
     
     # Open the champions file and reads it
     try:
-        with open(cwd + "/src/database/champions.json") as f:
+        with open("database/champions.json") as f:
             data = json.load(f)
             for champion in data:
                 table.add_row(

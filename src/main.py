@@ -1,5 +1,4 @@
 import json
-from turtle import pos
 import yaml
 from rich.table import Table
 from rich.console import Console
@@ -122,7 +121,7 @@ def clear_screen():
 
 
 def restart():
-    console.print("Restarting...", style="green", end="")
+    console.print("Restarting...", style="green", end="\n")
     
     # Restartes program
     os.execv(sys.executable, ['python3'] + sys.argv)

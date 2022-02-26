@@ -2,5 +2,5 @@ version: '1.0'
 
 services:
   team-local-tactics:
+    image: team-local-tactics:latest
     build: .
-    dockerfile: ./Dockerfile

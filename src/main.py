@@ -25,6 +25,7 @@ def print_all_champions():
     try:
         with open(cwd + "/src/database/champions.json") as f:
             data = json.load(f)
+            data.sort(key=lambda x: x["name"])
             for champion in data:
                 table.add_row(
                     champion["name"].capitalize(), 
@@ -39,18 +40,19 @@ def print_all_champions():
 
 
 def get_all_champions():
-    with open(cwd + "/src/database/champions.json") as f:
-        champions_objs = json.load(f)
-        for champion in champions_objs:
-            champions = [champion["name"]]
-    f.close()
-    return champions
+    try: 
+        with open(cwd + "/src/database/champions.json") as f:
+            champions = json.load(f)
+        f.close()
+        return champions
+    except Exception as e:
+        console.print(f"Error with champions.json: {e}", style=ERR_CLR)
 
 
 def input_champion(prompt, color, champions, player1, player2):
     # Prompts user to input a champion
     while True:
-        match Prompt.ask(f'[{color}]{prompt}'):
+        match Prompt.ask(f'[{color}]{prompt}').lower():
             case name if name not in champions:
                 console.print(f'The champion {name} is not available. Try again.', style=ERR_CLR)
             case name if name in player1:
@@ -64,6 +66,48 @@ def input_champion(prompt, color, champions, player1, player2):
     return player1, player2
 
 
+def print_summary(match):
+
+    EMOJI = {
+        Shape.ROCK: ':raised_fist-emoji:',
+        Shape.PAPER: ':raised_hand-emoji:',
+        Shape.SCISSORS: ':victory_hand-emoji:'
+    }
+
+    # For each round print a table with the results
+    for index, round in enumerate(match.rounds):
+
+        # Create a table containing the results of the round
+        round_summary = Table(title=f'Round {index+1}')
+
+        # Add columns for each team
+        round_summary.add_column("Red",
+                                 style="red",
+                                 no_wrap=True)
+        round_summary.add_column("Blue",
+                                 style="blue",
+                                 no_wrap=True)
+
+        # Populate the table
+        for key in round:
+            red, blue = key.split(', ')
+            round_summary.add_row(f'{red} {EMOJI[round[key].red]}',
+                                  f'{blue} {EMOJI[round[key].blue]}')
+        print(round_summary)
+        print('\n')
+
+    # Print the score
+    red_score, blue_score = match.score
+    print(f'Red: {red_score}\n'
+          f'Blue: {blue_score}')
+
+    # Print the winner
+    if red_score > blue_score:
+        print('\n[red]Red victory! :grin:')
+    elif red_score < blue_score:
+        print('\n[blue]Blue victory! :grin:')
+    else:
+        print('\nDraw :expressionless:')
 
 
 def start():
@@ -73,13 +117,22 @@ def start():
     print_all_champions()
 
     champions = get_all_champions()
+
     player1 = []
     player2 = []
 
+    player1_name = prompt.ask(f"Player 1, what is your name? (empty for Player 1)")
+    if not player1_name:
+        player1_name = "Player 1"
+
+    player2_name = prompt.ask(f"Player 2, what is your name? (empty for Player 2)")
+    if not player2_name:
+        player2_name = "Player 1"
+
     # Champion selection
     for _ in range(2):
-        input_champion('Player 1', 'red', champions, player1, player2)
-        input_champion('Player 2', 'blue', champions, player2, player1)
+        input_champion(player1_name, P1_CLR, champions, player1, player2)
+        input_champion(player2_name, P2_CLR, champions, player2, player1)
 
     print('\n')
 
@@ -89,8 +142,8 @@ def start():
     )
     match.play()
 
-    # Print a summary
-    print_match_summary(match)
+    # Print summary of match, and adds the match to match history.
+    print_summary(match)
 
 
 commands = {

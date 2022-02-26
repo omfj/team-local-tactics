@@ -1,3 +1,4 @@
+from click import style
 from rich import print
 from rich.prompt import Prompt
 from rich.table import Table
@@ -25,22 +26,18 @@ def print_available_champs(champions: dict[Champion]) -> None:
     print(available_champs)
 
 
-def input_champion(prompt: str,
-                   color: str,
-                   champions: dict[Champion],
-                   player1: list[str],
-                   player2: list[str]) -> None:
+def input_champion(prompt, color, champions, player1, player2):
 
     # Prompt the player to choose a champion and provide the reason why
     # certain champion cannot be selected
     while True:
-        match Prompt.ask(f'[{color}]{prompt}'):
+        match Prompt.ask(f"[{color}]{prompt}"):
             case name if name not in champions:
-                print(f'The champion {name} is not available. Try again.')
+                print(f"The champion {name} is not available. Try again.")
             case name if name in player1:
-                print(f'{name} is already in your team. Try again.')
+                print(f"{name} is already in your team. Try again.")
             case name if name in player2:
-                print(f'{name} is in the enemy team. Try again.')
+                print(f"{name} is in the enemy team. Try again.")
             case _:
                 player1.append(name)
                 break
@@ -49,9 +46,9 @@ def input_champion(prompt: str,
 def print_match_summary(match: Match) -> None:
 
     EMOJI = {
-        Shape.ROCK: ':raised_fist-emoji:',
-        Shape.PAPER: ':raised_hand-emoji:',
-        Shape.SCISSORS: ':victory_hand-emoji:'
+        Shape.ROCK: ":raised_fist-emoji:",
+        Shape.PAPER: ":raised_hand-emoji:",
+        Shape.SCISSORS: ":victory_hand-emoji:"
     }
 
     # For each round print a table with the results
@@ -83,20 +80,20 @@ def print_match_summary(match: Match) -> None:
 
     # Print the winner
     if red_score > blue_score:
-        print('\n[red]Red victory! :grin:')
+        print("\n[red]Red victory! :grin:")
     elif red_score < blue_score:
-        print('\n[blue]Blue victory! :grin:')
+        print("\n[blue]Blue victory! :grin:")
     else:
-        print('\nDraw :expressionless:')
+        print("\nDraw :expressionless:")
 
 
 def main() -> None:
 
-    print('\n'
-          'Welcome to [bold yellow]Team Local Tactics[/bold yellow]!'
-          '\n'
-          'Each player choose a champion each time.'
-          '\n')
+    print("\n"
+          "Welcome to [bold yellow]Team Local Tactics[/bold yellow]!"
+          "\n"
+          "Each player choose a champion each time."
+          "\n")
 
     champions = load_some_champs()
     print_available_champs(champions)
@@ -107,8 +104,8 @@ def main() -> None:
 
     # Champion selection
     for _ in range(2):
-        input_champion('Player 1', 'red', champions, player1, player2)
-        input_champion('Player 2', 'blue', champions, player2, player1)
+        input_champion("Player 1", "red", champions, player1, player2)
+        input_champion("Player 2", "blue", champions, player2, player1)
 
     print('\n')
 

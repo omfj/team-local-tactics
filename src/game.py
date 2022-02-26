@@ -82,9 +82,6 @@ class Match:
     n_rounds: int = 3
 
     def play(self):
-        """
-        Play a match.
-        """
         self._red_score = 0
         self._blue_score = 0
         self._rounds = [{} for _ in range(self.n_rounds)]

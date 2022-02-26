@@ -31,4 +31,20 @@ docker build --tag team-local-tactics .
 docker run -it team-local-tactics:latest
 ```
 
-Made by [Ole Magnus](https://github.com/omfj) and [Eirik](https://github.com/eirikbe01)
+# Made by
+<table>
+    <td align="center">
+        <a href="https://github.com/omfj">
+            <img height="100" src="https://avatars.githubusercontent.com/u/32321558?v=4" />
+            <br>
+            <sub><b>Ole Magnus</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/eirikbe01">
+            <img height="100" src="https://avatars.githubusercontent.com/u/100426260?v=4" />
+            <br>
+            <sub><b>Eirik</b></sub>
+        </a>
+    </td>
+</table>

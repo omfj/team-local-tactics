@@ -2,8 +2,7 @@ from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
 from server.game import Champion, Match, Shape, Team
-from server.commands import help_message, get_match_history, error_command, clear_screen, restart, welcome_message
-from server.commands import TITLE, T_H_CLR, T_B_CLR, TXT_CLR, ERR_CLR, P1_CLR, P2_CLR, PROMPT
+from commands import *
 import os
 import json
 
@@ -146,41 +145,17 @@ def start():
     print_summary(match)
 
 
-commands = {
-    # Start game TODO
-    "start": start,
-    "s": start,
-
-    # Get help
-    "help": help_message,
-    "h": help_message,
-
-    # Get match history TODO
-    "his": get_match_history,
-    "history": get_match_history,
-
-    # Get champions
-    "champions": print_all_champions,
-    "champs": print_all_champions,
-
-    # Clear screen
-    "clear": clear_screen,
-    
-    # Restart
-    "restart": restart,
-}
-
-if __name__ == "__main__":
-    welcome_message()
-    while (command := input(f"{PROMPT} ").lower()):
-        # Print for empty space
-        print()
+# if __name__ == "__main__":
+#     welcome_message()
+#     while (command := input(f"{PROMPT} ").lower()):
+#         # Print for empty space
+#         print()
         
-        # Check if the command is in the commands dictionary
-        if command in commands:
-            commands[command]()
-        elif command == ("exit" or "e"):
-            console.print("Goodbye!", style="bold green")
-            break
-        else:
-            error_command(command)
+#         # Check if the command is in the commands dictionary
+#         if command in commands:
+#             commands[command]()
+#         elif command == ("exit" or "e"):
+#             console.print("Goodbye!", style="bold green")
+#             break
+#         else:
+#             error_command(command)

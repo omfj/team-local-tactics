@@ -37,7 +37,8 @@ def help_message() -> None:
         with open(cwd + "/src/database/help.json") as f:
             commands: list = json.load(f)
             for command in commands:
-                name: str; description: str; alias: str = command["name"], command["description"], command["alias"]
+                name: str; description: str; alias: str 
+                name, description, alias = command["name"], command["description"], command["alias"]
                 console.print(f"'{name}' - {description}" +
                               (f" (alias: '{alias}')" if alias else ""))
     except Exception as e:
@@ -287,7 +288,7 @@ def start() -> None:
         console.print("\n\nExiting champion selection...", style="red", end="\n\n")
 
 
-commands: dict[str, function] = {
+commands = {
     # Start game TODO
     "start": start,
     "s": start,
@@ -316,8 +317,7 @@ commands: dict[str, function] = {
 if __name__ == "__main__":
     welcome_message()
     while (command := input(f"{PROMPT} ").lower()):
-        command += " "
-        command: str; arg: str = command.split(" ", 1)
+        command, arg = (command + " ").split(" ", 1)
         # Check if the command is in the commands dictionary
         if command in commands:
             if arg:

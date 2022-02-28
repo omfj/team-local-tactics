@@ -1,6 +1,7 @@
 from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
+from main import commands
 import json
 import os
 import sys
@@ -20,7 +21,6 @@ ERR_CLR = "bold red"
 P1_CLR = "bold blue"
 P2_CLR = "bold red"
 PROMPT = ">>>"
-
 
 def welcome_message():
     # Instantiate the console

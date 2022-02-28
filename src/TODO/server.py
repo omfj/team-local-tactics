@@ -8,28 +8,26 @@ console = Console()
 
 commands = {
     # Start game TODO
-    # "start": start,
-    # "s": start,
+    "start": start,
+    "s": start,
 
-    # # Get help
-    # "help": help_message,
-    # "h": help_message,
+    # Get help
+    "help": help_message,
+    "h": help_message,
 
-    # # Get match history TODO
-    # "his": get_match_history,
-    # "history": get_match_history,
+    # Get match history TODO
+    "his": get_match_history,
+    "history": get_match_history,
 
-    # # Get champions
-    # "champions": print_all_champions,
-    # "champs": print_all_champions,
+    # Get champions
+    "champions": print_all_champions,
+    "champs": print_all_champions,
 
-    # # Clear screen
-    # "clear": clear_screen,
+    # Clear screen
+    "clear": clear_screen,
     
-    # # Restart
-    # "restart": restart,
-
-    "test": "hello",
+    # Restart
+    "restart": restart,
 }
 
 

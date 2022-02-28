@@ -26,8 +26,14 @@ docker build --tag team-local-tactics .
 ```
 
 4. Run the container
+If you're on Linux or MacOS run:
 ```bash
 docker run -it team-local-tactics:latest
+```
+
+If you're on Windows, run this in git bash:
+```bash
+winpty docker run -it team-local-tactics:latest
 ```
 
 5. When you're inside the container type help to get a list of all the commands

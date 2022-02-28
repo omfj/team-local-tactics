@@ -50,6 +50,7 @@ def read(conn):
         return resp
     else:
         console.print("Connection closed")
+        conn.close()
 
 # Set up TCP socket
 sock = create_server(("localhost", 6666))

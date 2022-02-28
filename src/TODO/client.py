@@ -1,10 +1,9 @@
-from socket import socket
+from socket import create_connection
 from rich.console import Console
 
 console = Console()
 
-sock = socket()
-sock.connect(("localhost", 6666))
+sock = create_connection(("localhost", 6666))
 
 while True:
     print("Welcome to the socket")

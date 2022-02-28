@@ -1,7 +1,7 @@
 from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
-from game_logic import Champion, Match, Shape, Team
+from game_logic import Match, Shape, Team
 import os
 import sys
 import json

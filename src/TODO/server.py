@@ -1,8 +1,8 @@
 from pydoc import cli
-from socket import socket, AF_INET, SOCK_STREAM
+from socket import create_server
 from threading import Thread
 from rich.console import Console
-from main import *
+from server.main import *
 
 console = Console()
 
@@ -31,6 +31,7 @@ commands = {
 }
 
 
+
 def accept(sock):
     while True:
         conn, address = sock.accept() 
@@ -51,8 +52,7 @@ def read(conn):
         console.print("Connection closed")
 
 # Set up TCP socket
-sock = socket(AF_INET, SOCK_STREAM)
-sock.bind(("localhost", 6666))
+sock = create_server(("localhost", 6666))
 
 # TODO Only accept 2 connections
 sock.listen(2)

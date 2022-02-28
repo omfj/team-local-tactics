@@ -6,38 +6,38 @@ import os
 import sys
 import json
 
-console = Console()
-prompt = Prompt()
-cwd = os.getcwd()
+console: object = Console()
+prompt: object = Prompt()
+cwd: str = os.getcwd()
 
 
 # Color variables
-TITLE = "bold blue"
-T_H_CLR = "bold green"
-T_B_CLR = "cyan"
-TXT_CLR = "white"
-ERR_CLR = "bold red"
-P1_CLR = "bold blue"
-P2_CLR = "bold red"
-PROMPT = ">>>"
+TITLE: str = "bold blue"
+T_H_CLR: str = "bold green"
+T_B_CLR: str = "cyan"
+TXT_CLR: str = "white"
+ERR_CLR: str = "bold red"
+P1_CLR: str = "bold blue"
+P2_CLR: str = "bold red"
+PROMPT: str = ">>>"
 
 
-def welcome_message():
+def welcome_message() -> None:
     # Instantiate the console
     console.print("Welcome to", style="bold", end=" ")
     console.print("Team Local Tactics!", style=TITLE)
     console.print("Type 'help' for a list of commands.", end="\n\n")
 
 
-def help_message():
+def help_message() -> None:
     console.print("Here are the commands you can use:", style="bold yellow")
 
     # Opens the help file and reads it
     try:
         with open(cwd + "/src/database/help.json") as f:
-            commands = json.load(f)
+            commands: list = json.load(f)
             for command in commands:
-                name, description, alias = command["name"], command["description"], command["alias"]
+                name: str; description: str; alias: str = command["name"], command["description"], command["alias"]
                 console.print(f"'{name}' - {description}" +
                               (f" (alias: '{alias}')" if alias else ""))
     except Exception as e:
@@ -45,17 +45,17 @@ def help_message():
     f.close()
 
 
-def get_match_history(id="0"):
+def get_match_history(id="0") -> None:
     # Make the table title and headers
     try:
         with open(cwd + "/src/database/match_history.json") as f:
-            matches = json.load(f)
-            match = matches[int(id)]
-            played = match["time"]
-            player1_name = match["player1"]["name"].capitalize()
-            player2_name = match["player2"]["name"].capitalize()
-            player1_score = match["player1"]["score"]
-            player2_score = match["player2"]["score"]
+            matches: list = json.load(f)
+            match: dict = matches[int(id)]
+            played: str = match["time"]
+            player1_name: str = match["player1"]["name"].capitalize()
+            player2_name: str = match["player2"]["name"].capitalize()
+            player1_score: int = match["player1"]["score"]
+            player2_score: int = match["player2"]["score"]
             
             # Title
             console.print(f"{player1_name} vs {player2_name}", style=f"{TITLE} underline")
@@ -73,9 +73,9 @@ def get_match_history(id="0"):
             # Score of each player
             for i in range(1, 3):
                 print()
-                player_name = match[f"player{i}"]["name"].capitalize()
-                player_score = match[f"player{i}"]["score"]
-                player_champions = match[f"player{i}"]["champions"]
+                player_name: str = match[f"player{i}"]["name"].capitalize()
+                player_score: int = match[f"player{i}"]["score"]
+                player_champions: list = match[f"player{i}"]["champions"]
                 
                 console.print(player_name)
                 console.print(f"\tScore: {player_score}")
@@ -88,10 +88,10 @@ def get_match_history(id="0"):
     f.close()
 
 
-def get_match_history_overview():
+def get_match_history_overview() -> None:
     try:
         with open(cwd + "/src/database/match_history.json") as f:
-            matches = json.load(f)
+            matches: list = json.load(f)
             console.print("Match history overview", style=f"{TITLE} underline")
             print()
             for id, match in enumerate(matches):
@@ -102,10 +102,10 @@ def get_match_history_overview():
     f.close()
 
 
-def error_command(command):
+def error_command(command: str) -> None:
     console.print(f"Unknown command: '{command}'.", style=ERR_CLR)
 
-    possible_commands = []
+    possible_commands: list = []
     for known_command in commands:
         if command in known_command:
             possible_commands.append(f"'{known_command}'")
@@ -124,7 +124,7 @@ def error_command(command):
     console.print("Type 'help' for a list of commands.", end="\n\n")
 
 
-def clear_screen():
+def clear_screen() -> None:
     if os.name == "posix":
         os.system("clear")
     elif os.name == "nt":
@@ -133,14 +133,14 @@ def clear_screen():
         console.print("Could not clear the screen.", style=ERR_CLR)
 
 
-def restart():
+def restart() -> None:
     console.print("Restarting...", style="green", end="\n\n")
 
     # Restartes program
     os.execv(sys.executable, ['python3'] + sys.argv)
 
 
-def print_all_champions():
+def print_all_champions() -> None:
     # Make the table title and headers
     table = Table(title="🏆 Champions 🏆", header_style=T_H_CLR)
     table.add_column("Name", justify="left", style=T_B_CLR)
@@ -151,7 +151,7 @@ def print_all_champions():
     # Open the champions file and reads it
     try:
         with open(cwd + "/src/database/champions.json") as f:
-            data = json.load(f)
+            data: list = json.load(f)
             data.sort(key=lambda x: x["name"])
             for champion in data:
                 table.add_row(
@@ -166,18 +166,18 @@ def print_all_champions():
         console.print(f"Error with champions.json: {e}", style=ERR_CLR)
 
 
-def get_all_champions():
+def get_all_champions() -> None:
     # Open the champions file from the database and returns it
     try:
         with open(cwd + "/src/database/champions.json") as f:
-            champions = json.load(f)
+            champions: list = json.load(f)
         f.close()
         return champions
     except Exception as e:
         console.print(f"Error with champions.json: {e}", style=ERR_CLR)
 
 
-def input_champion(prompt, color, champions, player1, player2):
+def input_champion(prompt: str, color: str, champions: list, player1: list, player2: list) -> tuple[list, list]:
     # Prompts user to input a champion
     while True:
         match Prompt.ask(f'[{color}]{prompt}').lower():
@@ -198,7 +198,7 @@ def input_champion(prompt, color, champions, player1, player2):
 
 
 
-def print_summary(match):
+def print_summary(match: any) -> None:
 
     EMOJI = {
         Shape.ROCK: ':raised_fist-emoji:',
@@ -242,7 +242,7 @@ def print_summary(match):
         print('\nDraw :expressionless:')
 
 
-def start():
+def start() -> None:
     console.print("Welcome players, to Team Local Tactics!", style=TITLE)
     console.print("Press <Ctrl> + <C> to exit at any time during the champion selection.", style="underline")
     console.print("First we start off by choosing your champions.",
@@ -250,23 +250,23 @@ def start():
 
     print_all_champions()
 
-    champions = get_all_champions()
+    champions: list = get_all_champions()
 
-    player1 = []
-    player2 = []
+    player1: list = []
+    player2: list = []
 
     # Try clause to catch "Ctrl + C/KeyboardInterrupt"
     # So you can exit if you wrote the name or wrong or something
     try:
-        player1_name = prompt.ask(
+        player1_name: str = prompt.ask(
             f"Player 1, what is your name? (empty for Player 1)")
         if not player1_name:
-            player1_name = "Player 1"
+            player1_name: str = "Player 1"
 
-        player2_name = prompt.ask(
+        player2_name: str = prompt.ask(
             f"Player 2, what is your name? (empty for Player 2)")
         if not player2_name:
-            player2_name = "Player 1"
+            player2_name: str = "Player 1"
 
         # Champion selection
         for _ in range(2):
@@ -287,7 +287,7 @@ def start():
         console.print("\n\nExiting champion selection...", style="red", end="\n\n")
 
 
-commands = {
+commands: dict[str, function] = {
     # Start game TODO
     "start": start,
     "s": start,
@@ -317,7 +317,7 @@ if __name__ == "__main__":
     welcome_message()
     while (command := input(f"{PROMPT} ").lower()):
         command += " "
-        command, arg = command.split(" ", 1)
+        command: str; arg: str = command.split(" ", 1)
         # Check if the command is in the commands dictionary
         if command in commands:
             if arg:

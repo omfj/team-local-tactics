@@ -39,18 +39,67 @@ def help_message():
             for command in commands:
                 name, description, alias = command["name"], command["description"], command["alias"]
                 console.print(f"'{name}' - {description}" +
-                              (f" (alias: {alias})" if alias else ""))
+                              (f" (alias: '{alias}')" if alias else ""))
     except Exception as e:
         console.print(f"Error with help.json: {e}", style=ERR_CLR)
     f.close()
 
 
-def get_match_history():
+def get_match_history(id="0"):
     # Make the table title and headers
-    table = Table(title="📚 Match History 📚", header_style=T_H_CLR)
-    table.add_column("Player 1", justify="left", style=T_B_CLR)
-    table.add_column("Player 2", justify="left", style=T_B_CLR)
-    table.add_column("Played", justify="left", style=T_B_CLR)
+    try:
+        with open(cwd + "/src/database/match_history.json") as f:
+            matches = json.load(f)
+            match = matches[int(id)]
+            played = match["time"]
+            player1_name = match["player1"]["name"].capitalize()
+            player2_name = match["player2"]["name"].capitalize()
+            player1_score = match["player1"]["score"]
+            player2_score = match["player2"]["score"]
+            
+            # Title
+            console.print(f"{player1_name} vs {player2_name}", style=f"{TITLE} underline")
+            console.print(f"Played at: {played}.")
+
+            # Determine winner
+            if player1_score > player2_score:
+                console.print(f"{player1_name} won the game.")
+            elif player2_score > player1_score:
+                console.print(f"{player2_name} won the game.")
+            else:
+                console.print("It was a tie.")
+
+
+            # Score of each player
+            for i in range(1, 3):
+                print()
+                player_name = match[f"player{i}"]["name"].capitalize()
+                player_score = match[f"player{i}"]["score"]
+                player_champions = match[f"player{i}"]["champions"]
+                
+                console.print(player_name)
+                console.print(f"\tScore: {player_score}")
+                console.print("\tChampions:")
+                for champion in player_champions:
+                    console.print(f"\t\t{champion.capitalize()}")
+
+    except Exception as e:
+        console.print(f"Error with match_history.json: {e}", style=ERR_CLR)
+    f.close()
+
+
+def get_match_history_overview():
+    try:
+        with open(cwd + "/src/database/match_history.json") as f:
+            matches = json.load(f)
+            console.print("Match history overview", style=f"{TITLE} underline")
+            print()
+            for id, match in enumerate(matches):
+                console.print(f"Match: {match['time']} | ID: {id}")
+
+    except Exception as e:
+        console.print(f"Error with match_history.json: {e}", style=ERR_CLR)
+    f.close()
 
 
 def error_command(command):
@@ -85,7 +134,7 @@ def clear_screen():
 
 
 def restart():
-    console.print("Restarting...", style="green", end="\n")
+    console.print("Restarting...", style="green", end="\n\n")
 
     # Restartes program
     os.execv(sys.executable, ['python3'] + sys.argv)
@@ -118,6 +167,7 @@ def print_all_champions():
 
 
 def get_all_champions():
+    # Open the champions file from the database and returns it
     try:
         with open(cwd + "/src/database/champions.json") as f:
             champions = json.load(f)
@@ -194,7 +244,7 @@ def print_summary(match):
 
 def start():
     console.print("Welcome players, to Team Local Tactics!", style=TITLE)
-    console.print("Press <Ctrl> + <C> to exit at any time during the champion selection.")
+    console.print("Press <Ctrl> + <C> to exit at any time during the champion selection.", style="underline")
     console.print("First we start off by choosing your champions.",
                   style=TXT_CLR, end="\n\n")
 
@@ -205,6 +255,8 @@ def start():
     player1 = []
     player2 = []
 
+    # Try clause to catch "Ctrl + C/KeyboardInterrupt"
+    # So you can exit if you wrote the name or wrong or something
     try:
         player1_name = prompt.ask(
             f"Player 1, what is your name? (empty for Player 1)")
@@ -232,7 +284,7 @@ def start():
         # Print summary of match, and adds the match to match history.
         print_summary(match)
     except KeyboardInterrupt:
-        console.print("\nExiting champion selection...", style="red", end="\n\n")
+        console.print("\n\nExiting champion selection...", style="red", end="\n\n")
 
 
 commands = {
@@ -247,6 +299,7 @@ commands = {
     # Get match history TODO
     "his": get_match_history,
     "history": get_match_history,
+    "hisover": get_match_history_overview,
 
     # Get champions
     "champions": print_all_champions,
@@ -263,10 +316,14 @@ commands = {
 if __name__ == "__main__":
     welcome_message()
     while (command := input(f"{PROMPT} ").lower()):
-
+        command += " "
+        command, arg = command.split(" ", 1)
         # Check if the command is in the commands dictionary
         if command in commands:
-            commands[command]()
+            if arg:
+                commands[command](arg)
+            else:
+                commands[command]()
             print()
         elif command == ("exit" or "e"):
             console.print("Goodbye!", style="bold green")

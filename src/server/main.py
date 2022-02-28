@@ -63,10 +63,16 @@ def error_command(command):
 
     if possible_commands:
         console.print("Did you mean: ", style=ERR_CLR, end="")
-        console.print(", ".join(possible_commands), end="")
+        if len(possible_commands) == 1:
+            console.print(possible_commands[0], end="")
+        elif len(possible_commands) == 2:
+            console.print(" or ".join(possible_commands), style=ERR_CLR, end="")
+        else:
+            console.print(", ".join(possible_commands[:-1]), end="")
+            console.print(f" or {possible_commands[-1]}", style=ERR_CLR, end="")
         console.print("?", style=ERR_CLR)
-        
-    console.print("Type 'help' for a list of commands.")
+
+    console.print("Type 'help' for a list of commands.", end="\n\n")
 
 
 def clear_screen():
@@ -141,6 +147,7 @@ def input_champion(prompt, color, champions, player1, player2):
     return player1, player2
 
 
+
 def print_summary(match):
 
     EMOJI = {
@@ -187,6 +194,7 @@ def print_summary(match):
 
 def start():
     console.print("Welcome players, to Team Local Tactics!", style=TITLE)
+    console.print("Press <Ctrl> + <C> to exit at any time during the champion selection.")
     console.print("First we start off by choosing your champions.",
                   style=TXT_CLR, end="\n\n")
 
@@ -197,31 +205,34 @@ def start():
     player1 = []
     player2 = []
 
-    player1_name = prompt.ask(
-        f"Player 1, what is your name? (empty for Player 1)")
-    if not player1_name:
-        player1_name = "Player 1"
+    try:
+        player1_name = prompt.ask(
+            f"Player 1, what is your name? (empty for Player 1)")
+        if not player1_name:
+            player1_name = "Player 1"
 
-    player2_name = prompt.ask(
-        f"Player 2, what is your name? (empty for Player 2)")
-    if not player2_name:
-        player2_name = "Player 1"
+        player2_name = prompt.ask(
+            f"Player 2, what is your name? (empty for Player 2)")
+        if not player2_name:
+            player2_name = "Player 1"
 
-    # Champion selection
-    for _ in range(2):
-        input_champion(player1_name, P1_CLR, champions, player1, player2)
-        input_champion(player2_name, P2_CLR, champions, player2, player1)
+        # Champion selection
+        for _ in range(2):
+            input_champion(player1_name, P1_CLR, champions, player1, player2)
+            input_champion(player2_name, P2_CLR, champions, player2, player1)
 
-    print('\n')
+        print('\n')
 
-    match = Match(
-        Team([champions[name] for name in player1]),
-        Team([champions[name] for name in player2])
-    )
-    match.play()
+        match = Match(
+            Team([champions[name] for name in player1]),
+            Team([champions[name] for name in player2])
+        )
+        match.play()
 
-    # Print summary of match, and adds the match to match history.
-    print_summary(match)
+        # Print summary of match, and adds the match to match history.
+        print_summary(match)
+    except KeyboardInterrupt:
+        console.print("\nExiting champion selection...", style="red", end="\n\n")
 
 
 commands = {
@@ -251,14 +262,12 @@ commands = {
 
 if __name__ == "__main__":
     welcome_message()
-
     while (command := input(f"{PROMPT} ").lower()):
-        # Print for empty space
-        print()
 
         # Check if the command is in the commands dictionary
         if command in commands:
             commands[command]()
+            print()
         elif command == ("exit" or "e"):
             console.print("Goodbye!", style="bold green")
             break

@@ -31,7 +31,6 @@ commands = {
 }
 
 
-
 def accept(sock):
     while True:
         conn, address = sock.accept() 

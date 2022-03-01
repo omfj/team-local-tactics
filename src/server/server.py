@@ -51,10 +51,12 @@ def read(conn):
         console.print("Connection closed")
         conn.close()
 
-# Set up TCP socket
-sock = create_server(("localhost", 6666))
 
-# TODO Only accept 2 connections
-sock.listen(2)
+if __name__ == "__main__":
+    # Set up TCP socket
+    sock = create_server(("localhost", 6666))
 
-accept(sock)
+    # TODO Only accept 2 connections
+    sock.listen(2)
+
+    accept(sock)

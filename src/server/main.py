@@ -5,6 +5,7 @@ from game_logic import Match, Shape, Team
 import os
 import sys
 import json
+from socket import create_connection
 
 console: object = Console()
 prompt: object = Prompt()
@@ -257,7 +258,7 @@ def start() -> None:
     player2: list = []
 
     # Try clause to catch "Ctrl + C/KeyboardInterrupt"
-    # So you can exit if you wrote the name or wrong or something
+    # So you can exit if you wrote the name wrong or something
     try:
         player1_name: str = prompt.ask(
             f"Player 1, what is your name? (empty for Player 1)")
@@ -314,9 +315,11 @@ commands = {
 }
 
 
+
 if __name__ == "__main__":
+    sock = create_connection(("localhost", 6666))
     welcome_message()
-    while (command := input(f"{PROMPT} ").lower()):
+    while (command := input(f"Please enter a command: ")):
         command, arg = (command + " ").split(" ", 1)
         # Check if the command is in the commands dictionary
         if command in commands:

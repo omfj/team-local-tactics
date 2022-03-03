@@ -1,5 +1,0 @@
-# Colorful prints and table
-rich
-
-# Read settings file
-pyaml

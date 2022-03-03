@@ -17,7 +17,7 @@ git clone https://github.com/omfj/team-local-tactics.git
 cd team-local-tactics
 ```
 
-### Docker
+### Docker (Doesn't work. Switched to docker compose.)
 Make sure you have docker downloaded. Then...
 
 3. Build the image

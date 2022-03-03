@@ -1,6 +1,13 @@
 version: '1.0'
 
 services:
-  team-local-tactics:
-    image: team-local-tactics:latest
-    build: .
+  server:
+    image: tlt-server:latest
+    build: src/server/.
+    ports:
+      - "0000:6666"
+  client-1:
+    image: tlt-client-1:latest
+    build: src/client/.
+    ports:
+      - "0000:6666"

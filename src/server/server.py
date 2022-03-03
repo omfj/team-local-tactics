@@ -20,10 +20,10 @@ def accept(sock: str) -> None:
 def read_database(database_name: str) -> str:
     try:
         with open(f"{cwd}{SLASH}database{SLASH}{database_name}.json", "r") as f:
-            database_conent: str = json.dumps(json.load(f))
+            database_content: str = json.dumps(json.load(f))
         f.close()
         
-        return database_conent
+        return database_content
     except Exception as e:
         console.log(f"Issues with reading the database, {database_name}.json.")
         console.log(f"Reason: {e}")
@@ -65,8 +65,7 @@ def start_game() -> None:
     
 
     match = Match(
-        Team([champions[name] for name in player1]),
-    )
+        Team([player1_champions[name] for name in player1_name]), Team([player2_champions[name] for name in player2_name]))
     match.play()
 
 

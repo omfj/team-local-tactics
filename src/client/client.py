@@ -1,58 +1,63 @@
+#!/usr/bin/env python3
+
 from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
-from game_logic import Match, Shape, Team
+from time import sleep
+from socket import socket
 import os
 import sys
 import json
-from socket import create_connection
 
 console: object = Console()
 prompt: object = Prompt()
 cwd: str = os.getcwd()
 
-
-# Color variables
+# Style variables for console.print()
 TITLE: str = "bold blue"
 T_H_CLR: str = "bold green"
 T_B_CLR: str = "cyan"
 TXT_CLR: str = "white"
 ERR_CLR: str = "bold red"
+INF_CLR: str = "bold yellow"
 P1_CLR: str = "bold blue"
 P2_CLR: str = "bold red"
 PROMPT: str = ">>>"
 
-
+# Welcome message for the start of the game
 def welcome_message() -> None:
-    # Instantiate the console
     console.print("Welcome to", style="bold", end=" ")
     console.print("Team Local Tactics!", style=TITLE)
     console.print("Type 'help' for a list of commands.", end="\n\n")
 
+# Help message, prints all commands by default, but you can get help for a specific command by typing 'help <command>'
+def help_message(command_name="all") -> None:
+    if command_name == "all":
+        console.print("Here are the commands you can use:", style=INF_CLR)
+        for command in help_database:
+            name: str; description: str; alias: str 
+            name, description, alias = command["name"], command["description"], command["alias"]
+            console.print(f"'{name}' - {description}" +
+                            (f" (alias: '{alias}')" if alias else ""))
+    elif command_name in [command["name"] for command in help_database]:
+        console.print(f"How to use '{command_name}'.", style=INF_CLR)
+        for command in help_database:
+            if command["name"] == command_name:
+                console.print(f"{command['name']} - {command['description']}" +
+                             (f" (alias: '{command['alias']}')" if command["alias"] else ""))
+                console.print(f"Usage: {command['usage']}")
+    else:
+        console.print("Unknown command: '{command_name}'. Remember you can't use aliases on with the help command.", style=ERR_CLR)
 
-def help_message() -> None:
-    console.print("Here are the commands you can use:", style="bold yellow")
-
-    # Opens the help file and reads it
-    try:
-        with open(cwd + "/src/database/help.json") as f:
-            commands: list = json.load(f)
-            for command in commands:
-                name: str; description: str; alias: str 
-                name, description, alias = command["name"], command["description"], command["alias"]
-                console.print(f"'{name}' - {description}" +
-                              (f" (alias: '{alias}')" if alias else ""))
-    except Exception as e:
-        console.print(f"Error with help.json: {e}", style=ERR_CLR)
-    f.close()
-
-
-def get_match_history(id="0") -> None:
-    # Make the table title and headers
-    try:
-        with open(cwd + "/src/database/match_history.json") as f:
-            matches: list = json.load(f)
-            match: dict = matches[int(id)]
+# Prints the match history. By default it prints an overview, but you can get all the details for a specific match by typing 'match <match_id>'
+def get_match_history(id: str = "all") -> None:
+    match_history_database: list = json.loads(get_database_content("match_history"))
+    if id == "all":
+        get_match_history_overview(match_history_database)
+    else:
+        id: int = int(id)
+        if id <= len(match_history_database) and id >= 0:
+            match: dict = match_history_database[id]
             played: str = match["time"]
             player1_name: str = match["player1"]["name"].capitalize()
             player2_name: str = match["player2"]["name"].capitalize()
@@ -84,26 +89,18 @@ def get_match_history(id="0") -> None:
                 console.print("\tChampions:")
                 for champion in player_champions:
                     console.print(f"\t\t{champion.capitalize()}")
+        else:
+            console.print("Invalid ID.", style=ERR_CLR)
 
-    except Exception as e:
-        console.print(f"Error with match_history.json: {e}", style=ERR_CLR)
-    f.close()
+# Helper function for get_match_history()
+def get_match_history_overview(match_history_database: list) -> None:
+    console.print("Match history overview", style=f"{TITLE} underline")
+    print()
+    for id, match in enumerate(match_history_database):
+        console.print(f"Match: {match['time']} | ID: {id}")
 
-
-def get_match_history_overview() -> None:
-    try:
-        with open(cwd + "/src/database/match_history.json") as f:
-            matches: list = json.load(f)
-            console.print("Match history overview", style=f"{TITLE} underline")
-            print()
-            for id, match in enumerate(matches):
-                console.print(f"Match: {match['time']} | ID: {id}")
-
-    except Exception as e:
-        console.print(f"Error with match_history.json: {e}", style=ERR_CLR)
-    f.close()
-
-
+# TODO Kan vente med denne
+# If the command is not recognized, print an error message. Also try to find what command the user meant.
 def error_command(command: str) -> None:
     console.print(f"Unknown command: '{command}'.", style=ERR_CLR)
 
@@ -125,7 +122,7 @@ def error_command(command: str) -> None:
 
     console.print("Type 'help' for a list of commands.", end="\n\n")
 
-
+# Clears the screen. Checks if the user is on Windows or Linux and uses the appropriate command.
 def clear_screen() -> None:
     if os.name == "posix":
         os.system("clear")
@@ -134,15 +131,16 @@ def clear_screen() -> None:
     else:
         console.print("Could not clear the screen.", style=ERR_CLR)
 
-
+# Restarts the program using the python3 argument on current file. Might not work if you are using a different interpreter.
 def restart() -> None:
-    console.print("Restarting...", style="green", end="\n\n")
+    console.print("\nRestarting...", style="green", end="\n\n")
 
     # Restartes program
     os.execv(sys.executable, ['python3'] + sys.argv)
 
-
+# Gets all champions from the server database, and prints them in a table with their name and stats.
 def print_all_champions() -> None:
+
     # Make the table title and headers
     table = Table(title="🏆 Champions 🏆", header_style=T_H_CLR)
     table.add_column("Name", justify="left", style=T_B_CLR)
@@ -150,158 +148,87 @@ def print_all_champions() -> None:
     table.add_column("Paper", justify="left", style=T_B_CLR)
     table.add_column("Scissors", justify="left", style=T_B_CLR)
 
-    # Open the champions file and reads it
-    try:
-        with open(cwd + "/src/database/champions.json") as f:
-            data: list = json.load(f)
-            data.sort(key=lambda x: x["name"])
-            for champion in data:
-                table.add_row(
-                    champion["name"].capitalize(),
-                    str(champion["abilities"]["rock"]) + "%",
-                    str(champion["abilities"]["paper"]) + "%",
-                    str(champion["abilities"]["scissors"]) + "%"
-                )
-        f.close()
-        console.print(table)
-    except Exception as e:
-        console.print(f"Error with champions.json: {e}", style=ERR_CLR)
+    champions_database: list = json.loads(get_database_content("champions"))
 
+    for champion in champions_database:
+        table.add_row(
+            champion["name"].capitalize(),
+            str(champion["abilities"]["rock"]) + "%",
+            str(champion["abilities"]["paper"]) + "%",
+            str(champion["abilities"]["scissors"]) + "%"
+        )
 
-def get_all_champions() -> None:
-    # Open the champions file from the database and returns it
-    try:
-        with open(cwd + "/src/database/champions.json") as f:
-            champions: list = json.load(f)
-        f.close()
-        return champions
-    except Exception as e:
-        console.print(f"Error with champions.json: {e}", style=ERR_CLR)
+    console.print(table)
 
-
-def input_champion(prompt: str, color: str, champions: list, player1: list, player2: list) -> tuple[list, list]:
-    # Prompts user to input a champion
-    while True:
-        match Prompt.ask(f'[{color}]{prompt}').lower():
-            case name if name not in champions:
-                console.print(
-                    f'The champion {name} is not available. Try again.', style=ERR_CLR)
-            case name if name in player1:
-                console.print(
-                    f'{name} is already in your team. Try again.', style=ERR_CLR)
-            case name if name in player2:
-                console.print(
-                    f'{name} is in the enemy team. Try again.', style=ERR_CLR)
-            case _:
-                player1.append(name)
-                break
-
-    return player1, player2
-
-
-
-def print_summary(match: any) -> None:
-
-    EMOJI = {
-        Shape.ROCK: ':raised_fist-emoji:',
-        Shape.PAPER: ':raised_hand-emoji:',
-        Shape.SCISSORS: ':victory_hand-emoji:'
-    }
-
-    # For each round print a table with the results
-    for index, round in enumerate(match.rounds):
-
-        # Create a table containing the results of the round
-        round_summary = Table(title=f'Round {index+1}')
-
-        # Add columns for each team
-        round_summary.add_column("Red",
-                                 style="red",
-                                 no_wrap=True)
-        round_summary.add_column("Blue",
-                                 style="blue",
-                                 no_wrap=True)
-
-        # Populate the table
-        for key in round:
-            red, blue = key.split(', ')
-            round_summary.add_row(f'{red} {EMOJI[round[key].red]}',
-                                  f'{blue} {EMOJI[round[key].blue]}')
-        print(round_summary)
-        print('\n')
-
-    # Print the score
-    red_score, blue_score = match.score
-    print(f'Red: {red_score}\n'
-          f'Blue: {blue_score}')
-
-    # Print the winner
-    if red_score > blue_score:
-        print('\n[red]Red victory! :grin:')
-    elif red_score < blue_score:
-        print('\n[blue]Blue victory! :grin:')
+# Sends what database the client needs, and the server returns the database
+def get_database_content(database_name: str) -> str:
+    sock.send(f"get_{database_name}_database".encode())
+    database_content: str = sock.recv(1024).decode()
+    if database_content == "error":
+        return f"error;Failed to load the database for: {database_name.replace('_', ' ')}."
     else:
-        print('\nDraw :expressionless:')
+        return database_content
 
-
-def start() -> None:
+# TODO 2
+# TODO 3 Argument for playing against AI
+# Starts the game. First asks for name, then waits until two players are connected.
+def start_lobby() -> None:
     console.print("Welcome players, to Team Local Tactics!", style=TITLE)
-    console.print("Press <Ctrl> + <C> to exit at any time during the champion selection.", style="underline")
-    console.print("First we start off by choosing your champions.",
-                  style=TXT_CLR, end="\n\n")
+    console.print("Press <Ctrl> + <C> to exit at any time during the champion selection.", style="underline", end="\n\n")
 
     print_all_champions()
 
-    champions: list = get_all_champions()
+    player_name: str = prompt.ask("Summoner, what is your name?")
+    sock.send(f"game_start_{player_name}".encode())
 
-    player1: list = []
-    player2: list = []
-
-    # Try clause to catch "Ctrl + C/KeyboardInterrupt"
-    # So you can exit if you wrote the name wrong or something
     try:
-        player1_name: str = prompt.ask(
-            f"Player 1, what is your name? (empty for Player 1)")
-        if not player1_name:
-            player1_name: str = "Player 1"
-
-        player2_name: str = prompt.ask(
-            f"Player 2, what is your name? (empty for Player 2)")
-        if not player2_name:
-            player2_name: str = "Player 1"
-
-        # Champion selection
-        for _ in range(2):
-            input_champion(player1_name, P1_CLR, champions, player1, player2)
-            input_champion(player2_name, P2_CLR, champions, player2, player1)
-
-        print('\n')
-
-        match = Match(
-            Team([champions[name] for name in player1]),
-            Team([champions[name] for name in player2])
-        )
-        match.play()
-
-        # Print summary of match, and adds the match to match history.
-        print_summary(match)
+        with console.status("[bold green]Searching for contestant...") as status:
+            while True:
+                sleep(1)
+                if sock.recv(1024).decode() == "lobby_found":
+                    break
+                else:
+                    status.update(sock.recv(1024).decode())
+        status.stop()
+        console.print("Contestant found!", style="green")
+        start_game()
     except KeyboardInterrupt:
-        console.print("\n\nExiting champion selection...", style="red", end="\n\n")
+        console.print("\nExited champion select.", style="red")
+        sock.send(f"game_leave_{player_name}".encode())
 
 
+def start_game() -> None:
+    what_pick: list[str] = ["first", "second"]
+    n_pick_champion: int = 0
+    while True:
+        if sock.recv(1024).decode() == "choose_champion":
+            while True:
+                picked_champion: str = prompt.ask(f"Choose your {what_pick[n_pick_champion]} champion")
+                sock.sendall(picked_champion.encode())
+                champion_pick_response = sock.recv(1024).decode()
+                if champion_pick_response == "champion_locked_in":
+                    console.print(f"Success, {picked_champion} is on your team!")
+                    break
+                else:
+                    console.print(champion_pick_response)
+                    continue
+        elif sock.recv(1024).decode() == "waiting":
+            console.print("Waiting for the other player to pick.")
+
+
+# All the possible commands the user can use, and their methods
 commands = {
     # Start game TODO
-    "start": start,
-    "s": start,
+    "start": start_lobby,
+    "s": start_lobby,
 
     # Get help
     "help": help_message,
     "h": help_message,
 
-    # Get match history TODO
-    "his": get_match_history,
+    # Get match history
     "history": get_match_history,
-    "hisover": get_match_history_overview,
+    "his": get_match_history,
 
     # Get champions
     "champions": print_all_champions,
@@ -312,24 +239,39 @@ commands = {
 
     # Restart
     "restart": restart,
+    "r": restart,
 }
 
+# What HOST and PORT the socket should connect to.
+HOST: str = "localhost"
+PORT: int = 6666
 
-
+# If name is main run this.
 if __name__ == "__main__":
-    sock = create_connection(("localhost", 6666))
+    sock = socket()
+    sock.connect((HOST, PORT))
+
+    help_database = json.loads(get_database_content("help"))
+
+    # TODO method for checking the databases
+
     welcome_message()
-    while (command := input(f"Please enter a command: ")):
-        command, arg = (command + " ").split(" ", 1)
-        # Check if the command is in the commands dictionary
-        if command in commands:
-            if arg:
-                commands[command](arg)
+
+    try:
+        while (command := input(f"{PROMPT} ")):
+            command: str; arg: str
+            command, arg = (command + " ").split(" ", 1)
+            # Check if the command is in the commands dictionary
+            if command in commands:
+                if arg:
+                    commands[command](arg.strip())
+                else:
+                    commands[command]()
+                print()
+            elif command in ["exit", "e"]:
+                console.print("\nGoodbye!", style="bold green")
+                break
             else:
-                commands[command]()
-            print()
-        elif command == ("exit" or "e"):
-            console.print("Goodbye!", style="bold green")
-            break
-        else:
-            error_command(command)
+                error_command(command)
+    except KeyboardInterrupt or EOFError:
+        console.print("\n\nGoodbye!", style="bold green")

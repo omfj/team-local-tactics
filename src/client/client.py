@@ -3,6 +3,7 @@
 from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
+from rich.progress import track
 from time import sleep
 from socket import socket, create_connection
 import os
@@ -133,9 +134,11 @@ def error_command(command: str) -> None:
 
 # Restarts the program using the python3 argument on current file. Might not work if you are using a different interpreter.
 def restart() -> None:
-    console.print("\nRestarting...", style="green", end="\n\n")
+    for _ in track(range(10), description="Restarting..."):
+        sleep(0.2)
+    #console.print("\nRestarting...", style="green", end="\n\n")
 
-    # Restartes program
+    # Restartes program with cool progressbar
     os.execv(sys.executable, ['python3'] + sys.argv)
 
 # Gets all champions from the server database, and prints them in a table with their name and stats.
@@ -176,6 +179,8 @@ def start_lobby() -> None:
     console.print("Welcome players, to Team Local Tactics!", style=TITLE)
     console.print("Press <Ctrl> + <C> to exit at any time during the champion selection.", style="underline", end="\n\n")
 
+    for _ in track(range(10), description="Loading champions..."):
+        sleep(0.5)
     print_all_champions()
 
     player_name: str = prompt.ask("Summoner, what is your name?")
@@ -188,6 +193,9 @@ def start_lobby() -> None:
                 break
     status.stop()
     console.print("Contestant found!", style="green")
+    for _ in track(range(10), description="Loading game...Please wait"):
+        console.print("Did you know Team Local Tactics is the best game ever?")
+        sleep(0.5)
     start_game()
 
 

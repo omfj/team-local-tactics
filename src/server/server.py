@@ -46,13 +46,14 @@ def start_game() -> None:
 
     for _ in range(2):
         for selecting_player in game_lobby:
-            selecting_player_conn = selecting_player[0]
+            selecting_player_conn: socket = selecting_player[0]
+            selecting_player_name: str = selecting_player[3]
             selecting_player_conn.sendall("choose_champion".encode())
             for waiting_player in game_lobby:
                 if waiting_player != selecting_player:
                     waiting_player_conn = waiting_player[0]
                     waiting_player_conn.send("waiting".encode())
-            input_champion(selecting_player_conn)
+            input_champion(selecting_player_conn, selecting_player_name)
 
     player1_name: str = game_lobby[0][3]
     player2_name: str = game_lobby[1][3]
@@ -71,15 +72,14 @@ def start_game() -> None:
 
 def input_champion(choosing_player_conn: socket, choosing_player_name: str):
     champions = json.loads(read_database("champions"))
-    print("FALGLAGLAGLLFLAGGG PRINT CONSOEL STAMTE MENT HERE??????")
 
     while True:
-        champion_selected = choosing_player_conn.recv(1024).decode()
+        champion_selected = choosing_player_conn.recv(1024).decode().lower()
         player1_champions: list = [champion for champion in game_lobby[0][4]]
         player2_champions: list = [champion for champion in game_lobby[1][4]]
         ERROR: str = "[bold red]"
 
-        if champion_selected not in champions:
+        if champion_selected not in [champion["name"] for champion in champions]:
             choosing_player_conn.sendall(f"{ERROR}Champion does not exist...".encode())
         elif champion_selected in player1_champions:
             choosing_player_conn.sendall(f"{ERROR}Champion has already been chosen...".encode())
@@ -91,7 +91,9 @@ def input_champion(choosing_player_conn: socket, choosing_player_name: str):
                 player_name = players[3]
                 player_champions = players[4]
                 if choosing_player_name == player_name:
-                    player_champions.append(champion_selected)
+                    for champion in champions:
+                        if champion["name"] == champion_selected:
+                            player_champions.append(champion_selected)
             break
 
 

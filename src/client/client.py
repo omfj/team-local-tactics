@@ -212,7 +212,7 @@ def start_game() -> None:
                 else:
                     console.print(champion_pick_response)
                     continue
-        elif sock.recv(1024).decode() == "waiting":
+        if sock.recv(1024).decode() == "waiting":
             console.print("Waiting for the other player to pick.")
 
 

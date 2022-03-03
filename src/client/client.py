@@ -4,7 +4,7 @@ from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
 from time import sleep
-from socket import socket
+from socket import socket, create_connection
 import os
 import sys
 import json
@@ -30,6 +30,15 @@ def welcome_message() -> None:
     console.print("Team Local Tactics!", style=TITLE)
     console.print("Type 'help' for a list of commands.", end="\n\n")
 
+# Clears the screen. Checks if the user is on Windows or Linux and uses the appropriate command.
+def clear_screen() -> None:
+    if os.name == "posix":
+        os.system("clear")
+    elif os.name == "nt":
+        os.system("cls")
+    else:
+        console.print("Could not clear the screen.", style=ERR_CLR)
+
 # Help message, prints all commands by default, but you can get help for a specific command by typing 'help <command>'
 def help_message(command_name="all") -> None:
     if command_name == "all":
@@ -47,7 +56,7 @@ def help_message(command_name="all") -> None:
                              (f" (alias: '{command['alias']}')" if command["alias"] else ""))
                 console.print(f"Usage: {command['usage']}")
     else:
-        console.print("Unknown command: '{command_name}'. Remember you can't use aliases on with the help command.", style=ERR_CLR)
+        console.print(f"Unknown command: '{command_name}'. Remember you can't use aliases on with the help command.", style=ERR_CLR)
 
 # Prints the match history. By default it prints an overview, but you can get all the details for a specific match by typing 'match <match_id>'
 def get_match_history(id: str = "all") -> None:
@@ -122,15 +131,6 @@ def error_command(command: str) -> None:
 
     console.print("Type 'help' for a list of commands.", end="\n\n")
 
-# Clears the screen. Checks if the user is on Windows or Linux and uses the appropriate command.
-def clear_screen() -> None:
-    if os.name == "posix":
-        os.system("clear")
-    elif os.name == "nt":
-        os.system("cls")
-    else:
-        console.print("Could not clear the screen.", style=ERR_CLR)
-
 # Restarts the program using the python3 argument on current file. Might not work if you are using a different interpreter.
 def restart() -> None:
     console.print("\nRestarting...", style="green", end="\n\n")
@@ -162,10 +162,10 @@ def print_all_champions() -> None:
 
 # Sends what database the client needs, and the server returns the database
 def get_database_content(database_name: str) -> str:
-    sock.send(f"get_{database_name}_database".encode())
+    sock.sendall(f"get_{database_name}_database".encode())
     database_content: str = sock.recv(1024).decode()
     if database_content == "error":
-        return f"error;Failed to load the database for: {database_name.replace('_', ' ')}."
+        return "null"
     else:
         return database_content
 
@@ -181,20 +181,14 @@ def start_lobby() -> None:
     player_name: str = prompt.ask("Summoner, what is your name?")
     sock.send(f"game_start_{player_name}".encode())
 
-    try:
-        with console.status("[bold green]Searching for contestant...") as status:
-            while True:
-                sleep(1)
-                if sock.recv(1024).decode() == "lobby_found":
-                    break
-                else:
-                    status.update(sock.recv(1024).decode())
-        status.stop()
-        console.print("Contestant found!", style="green")
-        start_game()
-    except KeyboardInterrupt:
-        console.print("\nExited champion select.", style="red")
-        sock.send(f"game_leave_{player_name}".encode())
+    with console.status("[bold green]Searching for contestant...") as status:
+        while True:
+            sleep(1)
+            if sock.recv(1024).decode() == "lobby_found":
+                break
+    status.stop()
+    console.print("Contestant found!", style="green")
+    start_game()
 
 
 def start_game() -> None:
@@ -207,7 +201,8 @@ def start_game() -> None:
                 sock.sendall(picked_champion.encode())
                 champion_pick_response = sock.recv(1024).decode()
                 if champion_pick_response == "champion_locked_in":
-                    console.print(f"Success, {picked_champion} is on your team!")
+                    console.print(f"Success, {picked_champion.capitalize()} is on your team!")
+                    n_pick_champion += 1
                     break
                 else:
                     console.print(champion_pick_response)
@@ -248,8 +243,7 @@ PORT: int = 6666
 
 # If name is main run this.
 if __name__ == "__main__":
-    sock = socket()
-    sock.connect((HOST, PORT))
+    sock: socket = create_connection((HOST, PORT))
 
     help_database = json.loads(get_database_content("help"))
 

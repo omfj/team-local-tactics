@@ -36,7 +36,7 @@ def start_lobby(conn: socket, address: str, port: int, name: str, champions: lis
 
     if len(game_lobby) >= 2:
         for player in game_lobby:
-            player[0].send("lobby_found".encode())
+            player[0].sendall("lobby_found".encode())
         console.log(f"Lobby full - {game_lobby}")
         start_game()
 
@@ -122,6 +122,7 @@ def read(conn: socket, address: tuple) -> None:
                         if database_content != "error":
                             console.log(f"Sending match history to {address}.")
                             conn.sendall(database_content.encode())
+
             elif client_input_decoded.split("_", 1)[0]== "game":
                 player_name: str = client_input_decoded.split("_", 2)[2]
                 method: str = client_input_decoded.split("_", 2)[1]
@@ -131,16 +132,6 @@ def read(conn: socket, address: tuple) -> None:
                 # game_start_name
                 if method == "start":
                     start_lobby(conn, player_address, player_port, player_name)
-                # game_leave_name
-                elif method == "leave":
-                    for player in game_lobby:
-                        player_name_to_rm = player[3]
-                        if player_name == player_name_to_rm:
-                            game_lobby.remove(player)
-                            console.log([player[3] for player in game_lobby])
-                # play against ai
-                elif method == "ai":
-                    pass
             else:
                 print(f"{address} sent an unknown command: '{client_input_decoded}'")
                 conn.sendall("error".encode())
@@ -163,7 +154,7 @@ if os_name == "nt":
 else:
     SLASH = "/"
 
-game_lobby: list[tuple[socket, str, int, str]] = []
+game_lobby: list[tuple[socket, str, int, str, list]] = []
 
 if __name__ == "__main__":
     # Set up TCP socket

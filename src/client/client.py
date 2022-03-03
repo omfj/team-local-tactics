@@ -142,7 +142,7 @@ def restart() -> None:
 def print_all_champions() -> None:
 
     # Make the table title and headers
-    table = Table(title="🏆 Champions 🏆", header_style=T_H_CLR)
+    table = Table(title="Champions", header_style=T_H_CLR)
     table.add_column("Name", justify="left", style=T_B_CLR)
     table.add_column("Rock", justify="left", style=T_B_CLR)
     table.add_column("Paper", justify="left", style=T_B_CLR)

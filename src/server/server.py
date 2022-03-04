@@ -149,12 +149,12 @@ TXT_CONN: str = "bold green"
 TXT_DCON: str = "bold red"
 
 # Self host and port
-HOST: str = "localhost"
+HOST: str = ""
 PORT: int = 6666
 LISTEN: int = 2
 
 # Database host and port
-DB_HOST: str = "localhost"
+DB_HOST: str = ""
 DB_PORT: int = 8888
 
 

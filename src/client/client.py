@@ -251,7 +251,7 @@ commands = {
 }
 
 # What HOST and PORT the socket should connect to.
-HOST: str = "localhost"
+HOST: str = ""
 PORT: int = 6666
 
 # If name is main run this.

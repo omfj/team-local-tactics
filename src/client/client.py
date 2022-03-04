@@ -4,10 +4,12 @@ from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.progress import track
+from typing import Optional
 from time import sleep
 from socket import socket, create_connection
 import os
 import sys
+
 
 console: object = Console()
 prompt: object = Prompt()
@@ -59,54 +61,61 @@ def help_message(command_name="all") -> None:
         console.print(f"Unknown command: '{command_name}'. Remember you can't use aliases on with the help command.", style=ERR_CLR)
 
 # Prints the match history. By default it prints an overview, but you can get all the details for a specific match by typing 'match <match_id>'
-def get_match_history(id: str = "all") -> None:
+def show_match_history(id: Optional[int or str]="all") -> None:
     match_history_database: list = get_database_content("match_history")
     if id == "all":
-        get_match_history_overview(match_history_database)
+        match_history_overview(match_history_database)
     else:
-        id: int = int(id)
-        if id <= len(match_history_database) and id >= 0:
-            match: dict = match_history_database[id]
-            played: str = match["time"]
-            player1_name: str = match["player1"]["name"].capitalize()
-            player2_name: str = match["player2"]["name"].capitalize()
-            player1_score: int = match["player1"]["score"]
-            player2_score: int = match["player2"]["score"]
-            
-            # Title
-            console.print(f"{player1_name} vs {player2_name}", style=f"{TITLE} underline")
-            console.print(f"Played at: {played}.")
-
-            # Determine winner
-            if player1_score > player2_score:
-                console.print(f"{player1_name} won the game.")
-            elif player2_score > player1_score:
-                console.print(f"{player2_name} won the game.")
-            else:
-                console.print("It was a tie.")
-
-
-            # Score of each player
-            for i in range(1, 3):
-                print()
-                player_name: str = match[f"player{i}"]["name"].capitalize()
-                player_score: int = match[f"player{i}"]["score"]
-                player_champions: list = match[f"player{i}"]["champions"]
-                
-                console.print(player_name)
-                console.print(f"\tScore: {player_score}")
-                console.print("\tChampions:")
-                for champion in player_champions:
-                    console.print(f"\t\t{champion.capitalize()}")
+        if id.isdigit():
+            id = int(id, 10)
+            try:
+                match_history(match_history_database, id)
+            except IndexError:
+                console.print(f"Match does not exist. '{id}' is an invalid ID.", style=ERR_CLR)
         else:
-            console.print("Invalid ID.", style=ERR_CLR)
+            console.print(f"Match does not exist. '{id}' is an invalid ID.", style=ERR_CLR)
 
-# Helper function for get_match_history()
-def get_match_history_overview(match_history_database: list) -> None:
+# Display the match overview
+def match_history_overview(match_history_database: list) -> None:
     console.print("Match history overview", style=f"{TITLE} underline")
     print()
     for id, match in enumerate(match_history_database):
         console.print(f"Match: {match['time']} | ID: {id}")
+
+# Display the match
+def match_history(match_history_database: list, id: int):
+    match: dict = match_history_database[id]
+    played: str = match["time"]
+    player1_name: str = match["player1"]["name"].capitalize()
+    player2_name: str = match["player2"]["name"].capitalize()
+    player1_score: int = match["player1"]["score"]
+    player2_score: int = match["player2"]["score"]
+    
+    # Title
+    console.print(f"{player1_name} vs {player2_name}", style=f"{TITLE} underline")
+    console.print(f"Played at: {played}.")
+
+    # Determine winner
+    if player1_score > player2_score:
+        console.print(f"{player1_name} won the game.")
+    elif player2_score > player1_score:
+        console.print(f"{player2_name} won the game.")
+    else:
+        console.print("It was a tie.")
+
+
+    # Score of each player
+    for i in range(1, 3):
+        print()
+        player_name: str = match[f"player{i}"]["name"].capitalize()
+        player_score: int = match[f"player{i}"]["score"]
+        player_champions: list = match[f"player{i}"]["champions"]
+        
+        console.print(player_name)
+        console.print(f"\tScore: {player_score}")
+        console.print("\tChampions:")
+        for champion in player_champions:
+            console.print(f"\t\t{champion.capitalize()}")
 
 # TODO Kan vente med denne
 # If the command is not recognized, print an error message. Also try to find what command the user meant.
@@ -225,8 +234,8 @@ commands = {
     "h": help_message,
 
     # Get match history
-    "history": get_match_history,
-    "his": get_match_history,
+    "history": show_match_history,
+    "his": show_match_history,
 
     # Get champions
     "champions": print_all_champions,
@@ -248,13 +257,7 @@ PORT: int = 6666
 if __name__ == "__main__":
     print()
     sock: socket = create_connection((HOST, PORT))
-
     help_database = get_database_content("help")
-    print(help_database)
-    print(type(help_database))
-
-    # TODO method for checking the databases
-
     welcome_message()
 
     try:

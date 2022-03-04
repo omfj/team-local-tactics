@@ -1,4 +1,4 @@
-# Requirements for client.py
+# Requirements for server.py
 
 # Colorful outputs and feature rich text
 rich

@@ -1,0 +1,7 @@
+# Requirements for database.py
+
+# Colorful outputs and feature rich text
+rich
+
+# YAML support
+pyaml

@@ -173,7 +173,7 @@ def print_all_champions() -> None:
 
 # Sends what database the client needs, and the server returns the database
 def get_database_content(database_name: str) -> str:
-    sock.sendall(f"get_{database_name}_database".encode())
+    sock.sendall(f"get_database {database_name}".encode())
     database_content: list = eval(sock.recv(1024).decode())
     return database_content
 
@@ -184,8 +184,6 @@ def start_lobby() -> None:
     console.print("Welcome players, to Team Local Tactics!", style=TITLE)
     console.print("Press <Ctrl> + <C> to exit at any time during the champion selection.", style="underline", end="\n\n")
 
-    for _ in track(range(10), description="Loading champions..."):
-        sleep(0.5)
     print_all_champions()
 
     player_name: str = prompt.ask("Summoner, what is your name?")
@@ -198,9 +196,7 @@ def start_lobby() -> None:
                 break
     status.stop()
     console.print("Contestant found!", style="green")
-    for _ in track(range(10), description="Loading game...Please wait"):
-        console.print("Did you know Team Local Tactics is the best game ever?")
-        sleep(0.5)
+
     start_game()
 
 
@@ -210,18 +206,22 @@ def start_game() -> None:
     while True:
         if sock.recv(1024).decode() == "choose_champion":
             while True:
-                picked_champion: str = prompt.ask(f"Choose your {what_pick[n_pick_champion]} champion")
-                sock.sendall(picked_champion.encode())
+                picked_champion: str = prompt.ask(f"Choose your {what_pick[n_pick_champion]} champion").lower()
+                sock.sendall(f"validate_champion {picked_champion}")
                 champion_pick_response = sock.recv(1024).decode()
-                if champion_pick_response == "champion_locked_in":
+                if champion_pick_response == "champion locked in":
                     console.print(f"Success, {picked_champion.capitalize()} is on your team!")
                     n_pick_champion += 1
                     break
                 else:
                     console.print(champion_pick_response)
-                    continue
-        if sock.recv(1024).decode() == "waiting":
+
+        elif sock.recv(1024).decode() == "waiting":
             console.print("Waiting for the other player to pick.")
+
+        elif sock.recv(1024).decode() == "match_done":
+            # Print latest match history
+            break
 
 
 # All the possible commands the user can use, and their methods

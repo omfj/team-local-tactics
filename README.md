@@ -6,6 +6,16 @@ A game for the mandatory assignment in INF142 at University of Bergen.
 Rock, paper, scissors with a twist! Choose between the different champions and crush your friends with even more [RNG](https://www.freecodecamp.org/news/rng-meaning-what-does-rng-stand-for-in-gaming/)!
 
 ## Installation
+
+### Dependencies
+For trying out the program on your own computer the requirements can be found in each folder under `src/`
+
+They are:
+```
+rich
+pyaml
+```
+
 ### Download the files
 1. Clone the files to your computer.
 ```bash
@@ -17,26 +27,9 @@ git clone https://github.com/omfj/team-local-tactics.git
 cd team-local-tactics
 ```
 
-### Docker (Doesn't work. Switched to docker compose.)
-Make sure you have docker downloaded. Then...
+## After installation
 
-3. Build the image
-```bash
-docker build --tag team-local-tactics .
-```
-
-4. Run the container
-If you're on Linux or MacOS run:
-```bash
-docker run -it team-local-tactics:latest
-```
-
-If you're on Windows, run this in git bash:
-```bash
-winpty docker run -it team-local-tactics:latest
-```
-
-5. When you're inside the container type help to get a list of all the commands
+1. When you're inside the container type help to get a list of all the commands
 ```bash
 >>> help
 ```

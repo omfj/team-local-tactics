@@ -2,3 +2,5 @@
 
 # Colorful outputs and feature rich text
 rich
+
+numpy

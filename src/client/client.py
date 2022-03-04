@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from http import server
 from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
@@ -173,9 +174,8 @@ def print_all_champions() -> None:
 
 # Sends what database the client needs, and the server returns the database
 def get_database_content(database_name: str) -> str:
-    sock.sendall(f"get_database {database_name}".encode())
-    database_content: list = eval(sock.recv(1024).decode())
-    return database_content
+    database_content: list = send_recieve(f"get_database {database_name}")
+    return eval(database_content)
 
 # TODO 2
 # TODO 3 Argument for playing against AI
@@ -186,37 +186,68 @@ def start_lobby() -> None:
 
     print_all_champions()
 
-    player_name: str = prompt.ask("Summoner, what is your name?")
+    player_name: str = prompt.ask("Summoner, what is your name?") 
+
+    if player_name == "":
+        player_name = f"Player {send_recieve('whoami')}"
+
+    console.print(f"Welcome, {player_name}!")
+
     sock.send(f"start_lobby {player_name}".encode())
 
     while sock.recv(1024).decode() != "lobby_found":
-        with console.status("[bold green]Searching for contestant...") as status:
+        with console.status("[bold green]Searching for another player...") as status:
             sleep(1)
+            status.start()
     else:
-        status.stop()
+        try:
+            status.stop()
+        except Exception:
+            pass
+        start_game()
 
-    console.print("Contestant found!", style="green")
 
-    start_game()
+def validate_champion(prompt: str) -> None:
+    all_champions: list = get_database_content("champions")
 
+    my_champions: list = eval(send_recieve("get_champions_filtered me"))
+    other_champions: list = eval(send_recieve("get_champions_filtered other"))
+
+    while True:
+        match Prompt.ask(f"[bold yellow]{prompt}").lower():
+            case name if name not in [champion["name"] for champion in all_champions]:
+                console.print(f"The champion {name} is not available. Try again.", style=ERR_CLR)
+            case name if name in my_champions:
+                console.print(f"{name} is already in your team. Try again.", style=ERR_CLR)
+            case name if name in other_champions:
+                console.print(f"{name} is in the enemy team. Try again.", style=ERR_CLR)
+            case _:
+                for champion in all_champions:
+                    if champion["name"] == name:
+                        sock.sendall(f"add_champion {champion}".encode())
+                break
+
+def test():
+    print(send_recieve("whoami"))
 
 def start_game() -> None:
+    console.print("Contestant found!", style="green")
     what_pick: list[str] = ["first", "second"]
     n_pick_champion: int = 0
+
     while True:
-        if sock.recv(1024).decode() == "choose_champion":
-            while sock.recv(1024).decode() != "champion locked in":
-                picked_champion: str = prompt.ask(f"Choose your {what_pick[n_pick_champion]} champion").lower()
-                sock.sendall(f"validate_champion {picked_champion}")
-            console.print(f"Success! The champion {picked_champion.capitalize()} has been added to your team.", style="bold green")
+        server_resp = sock.recv(1024).decode()
 
-        elif sock.recv(1024).decode() == "waiting":
-            console.print("Waiting for the other player to pick.")
+        if server_resp == "choose_champion":
+            validate_champion(f"Choose your {what_pick[n_pick_champion]} champion")
+        elif server_resp == "wait":
+            sleep(0.1)
+        else:
+            print(server_resp)
 
-        elif sock.recv(1024).decode() == "match_done":
-            # Print latest match history
-            break
-
+def send_recieve(command: str) -> str:
+    sock.sendall(command.encode())
+    return sock.recv(1024).decode()
 
 # All the possible commands the user can use, and their methods
 commands = {
@@ -242,6 +273,9 @@ commands = {
     # Restart
     "restart": restart,
     "r": restart,
+    
+    # Test
+    "test": test,
 }
 
 # What HOST and PORT the socket should connect to.

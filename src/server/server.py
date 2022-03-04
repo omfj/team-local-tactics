@@ -9,10 +9,10 @@ from os import getcwd
 
 ##### DATABASE LOGIC
 # Reading the data base
-def get_database(database_name: str) -> str:
+def get_database(conn: socket, database_name: str) -> str:
     db_conn.sendall(f"read_database {database_name}".encode())
-    db_response = db_conn.recv(8024).decode()
-    return db_response
+    db_response: str = db_conn.recv(8024).decode()
+    conn.sendall(db_response.encode())
 
 
 ##### PLAYING TEAM LOCAL TACTICS
@@ -90,12 +90,16 @@ def read(conn: socket, address: tuple) -> None:
         
         if client_input:
             client_input_decoded: str = client_input.decode().split(" ", 1)
-            console.log(f"{address} sent: '{client_input_decoded}'")
             command: str = client_input_decoded[0]
             args: str = client_input_decoded[1]
 
+            console.log(f"{address} sent: {client_input_decoded}")
+
             if command in commands:
-                commands[command](args)
+                if args:
+                    commands[command](conn, args)
+                else:
+                    commands[command]()
             else:
                 conn.sendall("[bold red]Invalid input!".encode())
 
@@ -140,9 +144,12 @@ if __name__ == "__main__":
     sock.listen()
 
     # Connect to the database
-    db_conn = create_connection((DB_HOST, DB_PORT))
+    try:
+        db_conn = create_connection((DB_HOST, DB_PORT))
+    except ConnectionRefusedError:
+        console.log(f"Connection to database on {DB_HOST}:{DB_PORT} has failed.", style=TXT_DCON)
 
-    console.print(f"Starting server on {HOST}:{PORT}", style="bold red")
+    console.print(f"Starting server on {HOST}:{PORT}.", style=TXT_DCON)
 
     accept(sock)
 

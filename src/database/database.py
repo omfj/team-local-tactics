@@ -6,10 +6,16 @@ from rich.console import Console
 from threading import Thread
 import yaml
 
+##### Colors
+TXT_INFO: str = "bold yellow"
+TXT_CONN: str = "bold green"
+TXT_DCON: str = "bold red"
+
+
 ##### DATABASE LOGIC #####
 # Read the database and return the contents as a string
 def read_database(conn: socket, address: tuple, database_name: str) -> None:
-    console.log(f"{address} asked for {database_name}", style="bold yellow")
+    console.log(f"{address} asked for the database '{database_name}'", style=TXT_INFO)
     with open(f"{database_name}.yaml", "r") as f:
         database_content: list = yaml.load(f, Loader=yaml.FullLoader)
     f.close()
@@ -23,15 +29,15 @@ def append_database(database_name: str, content: str) -> None:
     f.close()
 
 ##### SOCKET LOGIC #####
-# Accept incoming connection
+# Accept incoming connections
 def accept(sock: str) -> None:
     while True:
         conn: str; address: tuple
         conn, address = sock.accept()
-        console.log(f"{address} has connected.", style="bold green")
+        console.log(f"Server {address} has connected.", style=TXT_CONN)
         Thread(target=read, args=(conn, address)).start()
 
-# Read the incoming connection
+# Read the incoming connections
 def read(conn: socket, address: tuple) -> None:
     while True:
         client_input: bytes = conn.recv(1024)
@@ -46,9 +52,9 @@ def read(conn: socket, address: tuple) -> None:
             if command in commands and arg:
                 commands[command](conn, address,  arg)
             else:
-                console.log(f"{address}, sent a command that does not exist: [{command}, {arg}]")
+                console.log(f"{address}, sent a command that does not exist: [{command}, {arg}]", style="bold yellow")
         else:
-            console.log(f"{address} has disconnected.", style="bold red")
+            console.log(f"{address} has disconnected.", style=TXT_DCON)
             conn.close()
             break
 

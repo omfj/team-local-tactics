@@ -4,27 +4,19 @@ from socket import socket, create_connection
 from threading import Thread
 from rich.console import Console
 from game_logic import Match, Team
-import json
 from os import getcwd
-from os import name as os_name
 
 
-def accept(sock: str) -> None:
-    while True:
-        conn: str; address: tuple
-        conn, address = sock.accept() 
-        console.log(f"Connection: '{conn}', from '{address}'")
-        Thread(target=read, args=(conn, address)).start()
-
-##### Read from database
-DB_HOST: str = "localhost"
-DB_PORT: int = 8888
+##### DATABASE LOGIC
+# Reading the data base
 def read_database(database_name: str) -> str:
     db_conn.sendall(f"read_database {database_name}".encode())
     db_response = db_conn.recv(8024).decode()
     return db_response
 
 
+##### PLAYING TEAM LOCAL TACTICS
+# A lobby, when a client is waiting for a game
 def start_lobby(conn: socket, address: str, port: int, name: str, champions: list=[]) -> None:
     game_lobby.append((conn, address, port, name, champions))
     console.log(f"'{name}' joined the game lobby. ({len(game_lobby)}/2)")
@@ -36,6 +28,7 @@ def start_lobby(conn: socket, address: str, port: int, name: str, champions: lis
         start_game()
 
 
+# When there is a full lobby, this starts the game
 def start_game() -> None:
     console.log("Starting game...")
 
@@ -63,9 +56,9 @@ def start_game() -> None:
         Team([player1_champions[name] for name in player1_name]), Team([player2_champions[name] for name in player2_name]))
     match.play()
 
-
+# Input champions
 def input_champion(choosing_player_conn: socket, choosing_player_name: str):
-    champions = json.loads(read_database("champions"))
+    champions = read_database("champions")
 
     while True:
         champion_selected = choosing_player_conn.recv(1024).decode().lower()
@@ -91,6 +84,17 @@ def input_champion(choosing_player_conn: socket, choosing_player_name: str):
             break
 
 
+##### SOCKET LOGIC #####
+# Accept incoming connections
+def accept(sock: str) -> None:
+    while True:
+        conn: str; address: tuple
+        conn, address = sock.accept() 
+        console.log(f"Client {address} has connected", style=TXT_CONN)
+        Thread(target=read, args=(conn, address)).start()
+
+
+# Read the incoming connections
 def read(conn: socket, address: tuple) -> None:
     while True:
         client_input: bytes = conn.recv(1024)
@@ -130,23 +134,29 @@ def read(conn: socket, address: tuple) -> None:
                 print(f"{address} sent an unknown command: '{client_input_decoded}'")
                 conn.sendall("error".encode())
         else:
-            
+            console.log(f"Client {address} has connected", style=TXT_DCON)
             conn.close()
             break
 
 
+##### MAIN #####
 error_text: str = str(["error", "An error occurred loading the data."]).encode()
 cwd: str = getcwd()
 console: Console = Console()
 
+# Console colors
+TXT_CONN: str = "bold green"
+TXT_DCON: str = "bold red"
+
+# Self host and port
 HOST: str = "localhost"
 PORT: int = 6666
 LISTEN: int = 2
 
-if os_name == "nt":
-    SLASH = "\\"
-else:
-    SLASH = "/"
+# Database host and port
+DB_HOST: str = "localhost"
+DB_PORT: int = 8888
+
 
 game_lobby: list[tuple[socket, str, int, str, list]] = []
 
@@ -156,10 +166,10 @@ if __name__ == "__main__":
     sock.bind((HOST, PORT))
     sock.listen()
 
+    # Connect to the database
     db_conn = create_connection((DB_HOST, DB_PORT))
 
     console.print(f"Starting server on {HOST}:{PORT}", style="bold red")
-    console.print(f"Running on {os_name.upper()}", style="bold yellow")
 
     accept(sock)
 

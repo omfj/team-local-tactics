@@ -82,7 +82,8 @@ def match_history_overview(match_history_database: list) -> None:
     for id, match in enumerate(match_history_database):
         console.print(f"Match: {match['time']} | ID: {id}")
 
-# Display the match
+# Display the match 
+# TODO Rewrite when refactored
 def match_history(match_history_database: list, id: int):
     match: dict = match_history_database[id]
     played: str = match["time"]

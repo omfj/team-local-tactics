@@ -66,7 +66,7 @@ commands: dict[str, Any] = {
 }
 
 # Host and port
-HOST: str = "localhost"
+HOST: str = ""
 PORT: int = 8888
 
 # Rich

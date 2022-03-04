@@ -1,0 +1,46 @@
+---
+- name: vain
+  abilities:
+    rock: 50
+    paper: 25
+    scissors: 25
+- name: dr. yi
+  abilities:
+    rock: 10
+    paper: 10
+    scissors: 80
+- name: twist
+  abilities:
+    rock: 10
+    paper: 25
+    scissors: 65
+- name: guan
+  abilities:
+    rock: 30
+    paper: 35
+    scissors: 35
+- name: siva
+  abilities:
+    rock: 60
+    paper: 20
+    scissors: 20
+- name: katina
+  abilities:
+    rock: 20
+    paper: 50
+    scissors: 30
+- name: asir
+  abilities:
+    rock: 5
+    paper: 5
+    scissors: 90
+- name: cactus
+  abilities:
+    rock: 5
+    paper: 90
+    scissors: 5
+- name: luanne
+  abilities:
+    rock: 90
+    paper: 5
+    scissors: 5

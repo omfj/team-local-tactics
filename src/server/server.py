@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from socket import socket
+from socket import socket, create_connection
 from threading import Thread
 from rich.console import Console
 from game_logic import Match, Team
@@ -16,18 +16,13 @@ def accept(sock: str) -> None:
         console.log(f"Connection: '{conn}', from '{address}'")
         Thread(target=read, args=(conn, address)).start()
 
-
+##### Read from database
+DB_HOST: str = "localhost"
+DB_PORT: int = 8888
 def read_database(database_name: str) -> str:
-    try:
-        with open(f"{cwd}{SLASH}database{SLASH}{database_name}.json", "r") as f:
-            database_content: str = json.dumps(json.load(f))
-        f.close()
-        
-        return database_content
-    except Exception as e:
-        console.log(f"Issues with reading the database, {database_name}.json.")
-        console.log(f"Reason: {e}")
-        return "error"
+    db_conn.sendall(f"read_database {database_name}".encode())
+    db_response = db_conn.recv(8024).decode()
+    return db_response
 
 
 def start_lobby(conn: socket, address: str, port: int, name: str, champions: list=[]) -> None:
@@ -98,7 +93,7 @@ def input_champion(choosing_player_conn: socket, choosing_player_name: str):
 
 def read(conn: socket, address: tuple) -> None:
     while True:
-        client_input: str = conn.recv(1024)
+        client_input: bytes = conn.recv(1024)
         
         if client_input:
             client_input_decoded: str = client_input.decode()
@@ -135,7 +130,7 @@ def read(conn: socket, address: tuple) -> None:
                 print(f"{address} sent an unknown command: '{client_input_decoded}'")
                 conn.sendall("error".encode())
         else:
-            console.log(f"{address} disconnected.", style="bold red")
+            
             conn.close()
             break
 
@@ -161,10 +156,12 @@ if __name__ == "__main__":
     sock.bind((HOST, PORT))
     sock.listen()
 
+    db_conn = create_connection((DB_HOST, DB_PORT))
+
     console.print(f"Starting server on {HOST}:{PORT}", style="bold red")
     console.print(f"Running on {os_name.upper()}", style="bold yellow")
 
     accept(sock)
 
     console.print("Stopping server.")
-    sock.close()
+    db_conn.close()

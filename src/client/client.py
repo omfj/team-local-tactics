@@ -8,7 +8,7 @@ from time import sleep
 from socket import socket, create_connection
 import os
 import sys
-import json
+import yaml
 
 console: object = Console()
 prompt: object = Prompt()
@@ -61,7 +61,7 @@ def help_message(command_name="all") -> None:
 
 # Prints the match history. By default it prints an overview, but you can get all the details for a specific match by typing 'match <match_id>'
 def get_match_history(id: str = "all") -> None:
-    match_history_database: list = json.loads(get_database_content("match_history"))
+    match_history_database: list = yaml.load(get_database_content("match_history"), Loader=yaml.FullLoader)
     if id == "all":
         get_match_history_overview(match_history_database)
     else:
@@ -136,7 +136,6 @@ def error_command(command: str) -> None:
 def restart() -> None:
     for _ in track(range(10), description="Restarting..."):
         sleep(0.2)
-    #console.print("\nRestarting...", style="green", end="\n\n")
 
     # Restartes program with cool progressbar
     os.execv(sys.executable, ['python3'] + sys.argv)
@@ -151,7 +150,7 @@ def print_all_champions() -> None:
     table.add_column("Paper", justify="left", style=T_B_CLR)
     table.add_column("Scissors", justify="left", style=T_B_CLR)
 
-    champions_database: list = json.loads(get_database_content("champions"))
+    champions_database: list = yaml.load(get_database_content("champions"), Loader=yaml.FullLoader)
 
     for champion in champions_database:
         table.add_row(
@@ -251,9 +250,10 @@ PORT: int = 6666
 
 # If name is main run this.
 if __name__ == "__main__":
+    print()
     sock: socket = create_connection((HOST, PORT))
 
-    help_database = json.loads(get_database_content("help"))
+    help_database = yaml.load(get_database_content("help"), Loader=yaml.FullLoader)
 
     # TODO method for checking the databases
 
@@ -263,10 +263,12 @@ if __name__ == "__main__":
         while (command := input(f"{PROMPT} ")):
             command: str; arg: str
             command, arg = (command + " ").split(" ", 1)
+            arg = arg.strip()
+
             # Check if the command is in the commands dictionary
             if command in commands:
                 if arg:
-                    commands[command](arg.strip())
+                    commands[command](arg)
                 else:
                     commands[command]()
                 print()

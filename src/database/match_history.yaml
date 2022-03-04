@@ -1,0 +1,14 @@
+---
+- time: 23:02 - 25 Feb
+  player1:
+    name: player1
+    score: 5
+    champions:
+      - twist
+      - vain
+  player2:
+    name: player2
+    score: 1
+    champions:
+      - cactus
+      - dr. yi

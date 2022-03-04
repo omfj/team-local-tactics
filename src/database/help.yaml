@@ -1,0 +1,29 @@
+---
+- name: start
+  description: Starts a game.
+  alias: s
+  usage: "[bold]start | s[/]"
+- name: help
+  description: Displays this message!
+  alias: h
+  usage: "[bold]help | h[/][yellow][ <COMMAND> ]"
+- name: history
+  description: Displays the history of previous games.
+  alias: his
+  usage: "[bold]history | his[/] [yellow][ <MATCH ID> ]"
+- name: champions
+  description: Displays all the champions.
+  alias: champs
+  usage: "[bold]champions | champs[/]"
+- name: clear
+  description: Clears the screen of text.
+  alias: ''
+  usage: "[bold]clear[/]"
+- name: restart
+  description: Restarts the program.
+  alias: r
+  usage: "[bold]restar | rt[/]"
+- name: exit
+  description: Exits the program.
+  alias: e
+  usage: "[bold]exit | e[/]"

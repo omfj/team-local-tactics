@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from socket import socket, create_server
+from socket import socket
 from typing import Any
 from rich.console import Console
 from threading import Thread
@@ -73,7 +73,9 @@ PORT: int = 8888
 console = Console()
 
 if __name__ == "__main__":
-    sock: socket = create_server((HOST, PORT))
+    sock = socket()
+    sock.bind((HOST, PORT))
+    sock.listen()
 
     console.print(f"Starting database server on {HOST}:{PORT}", style="bold red")
 

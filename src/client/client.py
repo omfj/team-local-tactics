@@ -257,9 +257,13 @@ PORT: int = 6666
 # If name is main run this.
 if __name__ == "__main__":
     print()
-    sock: socket = create_connection((HOST, PORT))
-    help_database = get_database_content("help")
-    welcome_message()
+
+    try:
+        sock: socket = create_connection((HOST, PORT))
+        help_database = get_database_content("help")
+        welcome_message()
+    except ConnectionRefusedError:
+        console.print("Could not connect to the server.", style=ERR_CLR)
 
     try:
         while (command := input(f"{PROMPT} ")):

@@ -187,14 +187,14 @@ def start_lobby() -> None:
     print_all_champions()
 
     player_name: str = prompt.ask("Summoner, what is your name?")
-    sock.send(f"game_start_{player_name}".encode())
+    sock.send(f"start_lobby {player_name}".encode())
 
-    with console.status("[bold green]Searching for contestant...") as status:
-        while True:
+    while sock.recv(1024).decode() != "lobby_found":
+        with console.status("[bold green]Searching for contestant...") as status:
             sleep(1)
-            if sock.recv(1024).decode() == "lobby_found":
-                break
-    status.stop()
+    else:
+        status.stop()
+
     console.print("Contestant found!", style="green")
 
     start_game()
@@ -205,16 +205,10 @@ def start_game() -> None:
     n_pick_champion: int = 0
     while True:
         if sock.recv(1024).decode() == "choose_champion":
-            while True:
+            while sock.recv(1024).decode() != "champion locked in":
                 picked_champion: str = prompt.ask(f"Choose your {what_pick[n_pick_champion]} champion").lower()
                 sock.sendall(f"validate_champion {picked_champion}")
-                champion_pick_response = sock.recv(1024).decode()
-                if champion_pick_response == "champion locked in":
-                    console.print(f"Success, {picked_champion.capitalize()} is on your team!")
-                    n_pick_champion += 1
-                    break
-                else:
-                    console.print(champion_pick_response)
+            console.print(f"Success! The champion {picked_champion.capitalize()} has been added to your team.", style="bold green")
 
         elif sock.recv(1024).decode() == "waiting":
             console.print("Waiting for the other player to pick.")

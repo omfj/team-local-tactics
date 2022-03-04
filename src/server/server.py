@@ -30,7 +30,7 @@ def start_lobby(conn: socket, name: str) -> None:
 
 # When there is a full lobby, this starts the game
 def start_game() -> None:
-    console.log("Starting game...")
+    console.log("Starting game...", style=TXT_INFO)
 
     for _ in range(2):
         for curr_player in lobby:
@@ -39,19 +39,18 @@ def start_game() -> None:
 
             # For all the other players in the lobby
             for waiting_player in lobby:
-                if not waiting_player == curr_player:
-                    waiting_player_conn = waiting_player[0]
-                    waiting_player_conn.sendall("waiting".encode())
+                if waiting_player != curr_player:
+                    waiting_player[0].sendall("waiting".encode())
     
+    if len(lobby[0][2]) == 2 and len(lobby[1][2]):
+        # match = Match(
+        #     Team([player1_champions[name] for name in player1_name]), Team([player2_champions[name] for name in player2_name]))
+        # match.play()
 
-    # match = Match(
-    #     Team([player1_champions[name] for name in player1_name]), Team([player2_champions[name] for name in player2_name]))
-    # match.play()
+        for player in lobby:
+            player[0].sendall("match_done".encode())
 
-    for player in lobby:
-        player[0].sendall("match_done".encode())
-
-    console.log("Match done!", style="bold green")
+        console.log("Match done!", style="bold green")
 
 # Validate a champion. If the champions passes the tests, add the champion to the players champion pool.
 def validate_champion(curr_player: socket, champion_selected: str):
@@ -86,20 +85,18 @@ def accept(sock: str) -> None:
 def read(conn: socket, address: tuple) -> None:
     while True:
         client_input: bytes = conn.recv(1024)
-        console.log(client_input)
         
         if client_input:
             client_input_decoded: str = client_input.decode().split(" ", 1)
             command: str = client_input_decoded[0]
             args: str = client_input_decoded[1]
 
-            console.log(f"{address} sent: {client_input_decoded}")
+            console.log(f"{address} sent: {client_input_decoded}", style=TXT_INFO)
 
             if command in commands:
                 if args:
                     commands[command](conn, args)
-                else:
-                    commands[command]()
+
             else:
                 conn.sendall("[bold red]Invalid input!".encode())
 
@@ -117,13 +114,13 @@ commands: dict = {
     "start_lobby": start_lobby,
 }
 
-error_text: str = str(["error", "An error occurred loading the data."]).encode()
 cwd: str = getcwd()
 console: Console = Console()
 
 # Console colors
 TXT_CONN: str = "bold green"
 TXT_DCON: str = "bold red"
+TXT_INFO: str = "bold yellow"
 
 # Self host and port
 HOST: str = ""

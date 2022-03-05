@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-from http import server
 from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.progress import track
+from functools import reduce
+from operator import concat
 from typing import Optional
 from time import sleep
 from socket import socket, create_connection
@@ -200,24 +201,19 @@ def start_lobby() -> None:
 def validate_champion(prompt: str) -> None:
     all_champions: list = get_database_content("champions")
 
-    lobby: list = eval(send_recieve("get_lobby"))
-    my_id: int = int(send_recieve("whoami"))
-    other_id: int = (my_id + 1) % 2
-
-    my_champions: list = lobby[my_id][1]
-    other_champions: list = lobby[other_id][1]
-
-    console.log(my_champions)
-    console.log(other_champions)
+    my_champions: list = eval(send_recieve("filter_champs me"))
+    my_champions: list = reduce(concat, my_champions)
+    other_champions: list = eval(send_recieve("filter_champs other"))
+    other_champions: list = reduce(concat, other_champions)
 
     while True:
         name: str = Prompt.ask(f"[bold yellow]{prompt}").lower()
         match name:
             case name if name not in [champion["name"] for champion in all_champions]:
                 console.print(f"The champion '{name}' is not available. Try again.", style=ERR_CLR)
-            case name if name in my_champions:
-                console.print(f"'{name}' is already in your team. Try again.", style=ERR_CLR)
-            case name if name in other_champions:
+            case name if name in [champion["name"] for champion in my_champions]:
+                console.print(f"'{name}' is already on your team. Try again.", style=ERR_CLR)
+            case name if name in [champion["name"] for champion in other_champions]:
                 console.print(f"'{name}' is in the enemy team. Try again.", style=ERR_CLR)
             case _:
                 for champion in all_champions:
@@ -227,7 +223,7 @@ def validate_champion(prompt: str) -> None:
 
 
 def get_turn() -> int:
-    sleep(1)
+    sleep(0.5)
     n_picked: int = int(send_recieve("total_picked"))
     picks_left = 4 - n_picked
     player_id: int = int(send_recieve("whoami"))
@@ -248,7 +244,11 @@ def start_game() -> None:
                 validate_champion(f"Pick your {pick[n]} champion")
                 n += 1
             case 1:
-                sleep(3)
+                sleep(0.5)
+    else:
+        for _ in track(range(10), description="Playing match..."):
+            sleep(0.2)
+
 
         
 

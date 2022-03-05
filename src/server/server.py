@@ -49,20 +49,27 @@ def add_champion(conn: socket, champion: str) -> None:
 
 def total_picked(conn: socket) -> None:
     n: int = 0
-    
-
     for player in lobby:
         n += len(player[2])
 
     conn.send(f"{n}".encode())
 
 
-def get_lobby(conn: socket) -> None:
-    lobby_to_send: list = []
-    for player in lobby:
-        lobby_to_send.append(player[1:])
+def filter_champs(conn: socket, filter="me") -> None:
+    my_champions = []
+    other_champions = []
 
-    conn.send(f"{lobby_to_send}".encode())
+    for player in lobby:
+        if player[0] == conn:
+            my_champions.append(player[2])
+        else:
+            other_champions.append(player[2])
+
+    if filter == "me":
+        conn.send(f"{my_champions}".encode())   
+    elif filter == "other":
+        conn.send(f"{other_champions}".encode())
+
 
 def whoami(conn: socket):
     found: bool = False
@@ -135,7 +142,7 @@ commands: dict = {
     "total_picked": total_picked,
     "whoami": whoami,
     "get_turn": get_turn,
-    "get_lobby": get_lobby,
+    "filter_champs": filter_champs,
 }
 
 cwd: str = getcwd()

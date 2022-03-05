@@ -36,7 +36,7 @@ cd team-local-tactics
 
 Have fun!
 
-# Made by
+# Made by group 71:
 <table>
     <td align="center">
         <a href="https://github.com/omfj">

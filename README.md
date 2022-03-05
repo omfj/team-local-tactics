@@ -8,9 +8,7 @@ Rock, paper, scissors with a twist! Choose between the different champions and c
 ## Installation
 
 ### Dependencies
-For trying out the program on your own computer the requirements can be found in each folder under `src/`
-
-They are:
+The program is written in [Python 3.10.x](https://www.python.org/downloads/release/python-3102/).For running the game locally on your own computer download the following dependencies with `pip`:
 ```
 rich
 pyaml
@@ -26,6 +24,8 @@ git clone https://github.com/omfj/team-local-tactics.git
 ```bash
 cd team-local-tactics
 ```
+
+## Docker (Coming soon)
 
 ## After installation
 

@@ -7,7 +7,7 @@ from threading import Thread
 import yaml
 
 ##### Colors
-TXT_INFO: str = "bold yellow"
+TXT_INFO: str = "yellow"
 TXT_CONN: str = "bold green"
 TXT_DCON: str = "bold red"
 
@@ -52,7 +52,7 @@ def read(conn: socket, address: tuple) -> None:
             if command in commands and arg:
                 commands[command](conn, address,  arg)
             else:
-                console.log(f"{address}, sent a command that does not exist: [{command}, {arg}]", style="bold yellow")
+                console.log(f"{address}, sent a command that does not exist: [{command}, {arg}]", style=TXT_INFO)
         else:
             console.log(f"{address} has disconnected.", style=TXT_DCON)
             conn.close()

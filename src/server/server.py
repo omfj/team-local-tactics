@@ -31,50 +31,57 @@ def start_lobby(conn: socket, name: str) -> None:
     lobby.append((conn, name, []))
     console.log(f"'{name}' joined the game lobby. ({len(lobby)}/2)", style=TXT_INFO)
 
-    if len(lobby) >= 2:
-        for player in lobby:
-            player[0].sendall("lobby_found".encode())
+    while len(lobby) < 2:
+        sleep(1)
+    else:
+        conn.sendall("lobby_found".encode())
         
         console.log(f"Lobby full - {[player[1] for player in lobby]}")
-        n: int = 0
-
-        while get_n_picked_champions() < 4:
-            n_picked_champions = get_n_picked_champions()
-            n = n % len(lobby)
-            console.log(n)
-            lobby[n][0].sendall("choose_champion".encode())
-            lobby[n + 1][0].sendall("wait".encode())
-            sleep(0.5)
-            if n_picked_champions == get_n_picked_champions():
-                sleep(0.5)
-            else:
-                n += 1
 
 
-
-def get_n_picked_champions() -> int:
-    n_picked_champions = len(lobby[0][2]) + len(lobby[1][2])
-    return n_picked_champions
 
 def add_champion(conn: socket, champion: str) -> None:
     for player in lobby:
         if player[0] == conn:
-            player[2].append(champion)
+            player[2].append(eval(champion))
+            console.log(f"{player[1]} has: {player[2]}")
 
-def get_champions_filtered(conn: socket, who: str) -> None:
-    champions: np.array = np.array([])
+
+def total_picked(conn: socket) -> None:
+    n: int = 0
+    
+
     for player in lobby:
-        if who == "me":
-            if player[0] == conn:
-                (champions.append(champion) for champion in player[2])
-        elif who == "other":
-            if player[0] != conn:
-                (champions.append(champion) for champion in player[2])
-    conn.sendall(str(champions.flatten()).encode())
+        n += len(player[2])
+
+    conn.send(f"{n}".encode())
+
+
+def get_lobby(conn: socket) -> None:
+    lobby_to_send: list = []
+    for player in lobby:
+        lobby_to_send.append(player[1:])
+
+    conn.send(f"{lobby_to_send}".encode())
 
 def whoami(conn: socket):
-    conn.sendall(f"{len(lobby) + 1}".encode())
+    found: bool = False
+    for id, player in enumerate(lobby):
+        if conn == player[0]:
+            conn.send(f"{id}".encode())
+            found = True
     
+    if not found:
+        conn.sendall(f"{len(lobby) + 1}".encode())
+
+
+def get_turn(conn: socket):
+    picks_left = 4 - (len(lobby[0][2]) + len(lobby[1][2]))
+
+    console.log(f"Picks left: {picks_left}", style=TXT_INFO)
+
+    console.log(f"{picks_left % 2}", style=TXT_INFO)
+    conn.send(f"{picks_left % 2}".encode())
 
 def remove_from_lobby(player_to_remove: socket, address: tuple) -> None:
     for player in lobby:
@@ -110,7 +117,7 @@ def read(conn: socket, address: tuple) -> None:
                 else:
                     commands[command](conn)
             else:
-                console.log("shitkraina")
+                console.log("AN UNKNOWN COMMAND WAS SENT!", style=TXT_DCON)
 
         else:
             console.log(f"Client {address} has disconnected", style=TXT_DCON)
@@ -125,8 +132,10 @@ commands: dict = {
     "get_database": get_database,
     "start_lobby": start_lobby,
     "add_champion": add_champion,
-    "get_champions_filtered": get_champions_filtered,
+    "total_picked": total_picked,
     "whoami": whoami,
+    "get_turn": get_turn,
+    "get_lobby": get_lobby,
 }
 
 cwd: str = getcwd()

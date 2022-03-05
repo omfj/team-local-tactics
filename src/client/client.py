@@ -33,12 +33,10 @@ def welcome_message() -> None:
     console.print("Team Local Tactics!", style=TITLE)
     console.print("Type 'help' for a list of commands.", end="\n\n")
 
-# Clears the screen. Checks if the user is on Windows or Linux and uses the appropriate command.
+# Clears the screen if the operatingsystem is unix-like. *Issues on windows
 def clear_screen() -> None:
     if os.name == "posix":
         os.system("clear")
-    elif os.name == "nt":
-        os.system("cls")
     else:
         console.print("Could not clear the screen.", style=ERR_CLR)
 
@@ -177,7 +175,7 @@ def get_database_content(database_name: str) -> str:
     database_content: list = send_recieve(f"get_database {database_name}")
     return eval(database_content)
 
-# TODO 2
+
 # TODO 3 Argument for playing against AI
 # Starts the game. First asks for name, then waits until two players are connected.
 def start_lobby() -> None:
@@ -195,55 +193,64 @@ def start_lobby() -> None:
 
     sock.send(f"start_lobby {player_name}".encode())
 
-    while sock.recv(1024).decode() != "lobby_found":
-        with console.status("[bold green]Searching for another player...") as status:
-            sleep(1)
-            status.start()
-    else:
-        try:
-            status.stop()
-        except Exception:
-            pass
+    if sock.recv(1024).decode() == "lobby_found":
         start_game()
 
 
 def validate_champion(prompt: str) -> None:
     all_champions: list = get_database_content("champions")
 
-    my_champions: list = eval(send_recieve("get_champions_filtered me"))
-    other_champions: list = eval(send_recieve("get_champions_filtered other"))
+    lobby: list = eval(send_recieve("get_lobby"))
+    my_id: int = int(send_recieve("whoami"))
+    other_id: int = (my_id + 1) % 2
+
+    my_champions: list = lobby[my_id][1]
+    other_champions: list = lobby[other_id][1]
+
+    console.log(my_champions)
+    console.log(other_champions)
 
     while True:
-        match Prompt.ask(f"[bold yellow]{prompt}").lower():
+        name: str = Prompt.ask(f"[bold yellow]{prompt}").lower()
+        match name:
             case name if name not in [champion["name"] for champion in all_champions]:
-                console.print(f"The champion {name} is not available. Try again.", style=ERR_CLR)
+                console.print(f"The champion '{name}' is not available. Try again.", style=ERR_CLR)
             case name if name in my_champions:
-                console.print(f"{name} is already in your team. Try again.", style=ERR_CLR)
+                console.print(f"'{name}' is already in your team. Try again.", style=ERR_CLR)
             case name if name in other_champions:
-                console.print(f"{name} is in the enemy team. Try again.", style=ERR_CLR)
+                console.print(f"'{name}' is in the enemy team. Try again.", style=ERR_CLR)
             case _:
                 for champion in all_champions:
                     if champion["name"] == name:
                         sock.sendall(f"add_champion {champion}".encode())
                 break
 
-def test():
-    print(send_recieve("whoami"))
+
+def get_turn() -> int:
+    sleep(1)
+    n_picked: int = int(send_recieve("total_picked"))
+    picks_left = 4 - n_picked
+    player_id: int = int(send_recieve("whoami"))
+    return (picks_left + (player_id)) % 2
+
 
 def start_game() -> None:
     console.print("Contestant found!", style="green")
-    what_pick: list[str] = ["first", "second"]
-    n_pick_champion: int = 0
+    
+    pick: list[str] = ["first", "second"]
+    n: int = 0
 
-    while True:
-        server_resp = sock.recv(1024).decode()
+    while n < 2:
+        turn: int = get_turn() 
 
-        if server_resp == "choose_champion":
-            validate_champion(f"Choose your {what_pick[n_pick_champion]} champion")
-        elif server_resp == "wait":
-            sleep(0.1)
-        else:
-            print(server_resp)
+        match turn:
+            case 0:
+                validate_champion(f"Pick your {pick[n]} champion")
+                n += 1
+            case 1:
+                sleep(3)
+
+        
 
 def send_recieve(command: str) -> str:
     sock.sendall(command.encode())
@@ -273,9 +280,6 @@ commands = {
     # Restart
     "restart": restart,
     "r": restart,
-    
-    # Test
-    "test": test,
 }
 
 # What HOST and PORT the socket should connect to.

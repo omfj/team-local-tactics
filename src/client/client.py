@@ -191,11 +191,12 @@ def start_lobby() -> None:
         player_name = f"Player {send_recieve('whoami')}"
 
     console.print(f"Welcome, {player_name}!")
+    
+    with console.status("[bold green]Searching for a challenger...", spinner="earth") as status:
+        if send_recieve(f"start_lobby {player_name}") == "lobby_found":
+            status.stop()
+            start_game()
 
-    sock.send(f"start_lobby {player_name}".encode())
-
-    if sock.recv(1024).decode() == "lobby_found":
-        start_game()
 
 
 def validate_champion(prompt: str) -> None:
@@ -210,11 +211,11 @@ def validate_champion(prompt: str) -> None:
         name: str = Prompt.ask(f"[bold yellow]{prompt}").lower()
         match name:
             case name if name not in [champion["name"] for champion in all_champions]:
-                console.print(f"The champion '{name}' is not available. Try again.", style=ERR_CLR)
+                console.print(f"The champion '{name.capitalize()}' is not available. Try again.", style=ERR_CLR)
             case name if name in [champion["name"] for champion in my_champions]:
-                console.print(f"'{name}' is already on your team. Try again.", style=ERR_CLR)
+                console.print(f"'{name.capitalize()}' is already on your team. Try again.", style=ERR_CLR)
             case name if name in [champion["name"] for champion in other_champions]:
-                console.print(f"'{name}' is in the enemy team. Try again.", style=ERR_CLR)
+                console.print(f"'{name.capitalize()}' is in the enemy team. Try again.", style=ERR_CLR)
             case _:
                 for champion in all_champions:
                     if champion["name"] == name:
@@ -223,7 +224,7 @@ def validate_champion(prompt: str) -> None:
 
 
 def get_turn() -> int:
-    sleep(0.5)
+    sleep(0.1)
     n_picked: int = int(send_recieve("total_picked"))
     picks_left = 4 - n_picked
     player_id: int = int(send_recieve("whoami"))
@@ -232,24 +233,37 @@ def get_turn() -> int:
 
 def start_game() -> None:
     console.print("Contestant found!", style="green")
+    console.print(f"Playing against: {send_recieve('get_opponent_names')}", style="bold red")
     
     pick: list[str] = ["first", "second"]
     n: int = 0
 
-    while n < 2:
-        turn: int = get_turn() 
+    with console.status("[green]Your opponent is picking a champion...") as status:
+        while n < 2:
+            status.start()
+            turn: int = get_turn() 
+            match turn:
+                case 0:
+                    status.stop()
+                    validate_champion(f"Pick your {pick[n]} champion")
+                    n += 1
+                case 1:
+                    sleep(0.5)
+        else:
+            end_game()
 
-        match turn:
-            case 0:
-                validate_champion(f"Pick your {pick[n]} champion")
-                n += 1
-            case 1:
-                sleep(0.5)
-    else:
-        for _ in track(range(10), description="Playing match..."):
-            sleep(0.2)
 
-
+def end_game() -> None:
+    with console.status("[green]Your opponent is picking a champion...") as status:
+        while int(send_recieve("total_picked")) < 4:
+            sleep(0.5)
+        else:
+            status.stop()
+            with console.status("[bold green]Playing the game...") as status:
+                while sock.recv(1024).decode() != "game_end":
+                        sleep(1)
+                else:
+                    console.print("GG WP!")
         
 
 def send_recieve(command: str) -> str:

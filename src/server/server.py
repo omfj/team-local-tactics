@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 from socket import socket, create_connection
+from game_logic import Champion, Match, Team
 from threading import Thread
 from rich.console import Console
 from time import sleep
-from game_logic import Match, Team
-import numpy as np
 from os import getcwd
 
 
@@ -18,6 +17,11 @@ def get_database(conn: socket, database_name: str, reciver="client") -> None:
         conn.sendall(db_response.encode())
     else:
         return eval(db_response)
+
+def get_database_server(database_name: str) -> list:
+    db_conn.sendall(f"read_database {database_name}".encode())
+    db_response: str = db_conn.recv(8024).decode()
+    return eval(db_response)
 
 
 ##### PLAYING TEAM LOCAL TACTICS
@@ -35,10 +39,38 @@ def start_lobby(conn: socket, name: str) -> None:
         sleep(1)
     else:
         conn.sendall("lobby_found".encode())
-        
         console.log(f"Lobby full - {[player[1] for player in lobby]}")
 
 
+def play_game() -> None:
+
+    while total_picked_server() < 4:
+        sleep(5)
+    else:
+        match: Match = Match(
+            Team([parse_champion(champion) for champion in lobby[0][2]]),
+            Team([parse_champion(champion) for champion in lobby[1][2]])
+        )
+
+        match.play()
+        console.log(match)
+        db_conn.send(f"append_match {match}".encode())
+
+        for player in lobby:
+            player[0].send("game_end".encode())
+
+        console.log("Match is over!")
+        lobby.clear()
+
+
+def parse_champion(champion_name: str) -> tuple[str, float, float, float]:
+    name: str; rock: int; paper: int; scissors: int
+    name = champion_name["name"]
+    rock = champion_name["abilities"]["rock"] / 100
+    paper = champion_name["abilities"]["paper"] / 100
+    scissors = champion_name["abilities"]["scissors"] / 100
+
+    return name, rock, paper, scissors
 
 def add_champion(conn: socket, champion: str) -> None:
     for player in lobby:
@@ -51,11 +83,26 @@ def total_picked(conn: socket) -> None:
     n: int = 0
     for player in lobby:
         n += len(player[2])
-
     conn.send(f"{n}".encode())
 
 
-def filter_champs(conn: socket, filter="me") -> None:
+def total_picked_server() -> int:
+    n: int = 0
+    for player in lobby:
+        n += len(player[2])
+
+    return n
+
+def get_opponent_names(conn: socket) -> None:
+    opponents = []
+    for player in lobby:
+        if player[0] != conn:
+            opponents.append(player[1])
+
+    conn.send(f"{', '.join(opponents)}".encode())
+
+
+def filter_champs(conn: socket, filter: str) -> None:
     my_champions = []
     other_champions = []
 
@@ -143,6 +190,7 @@ commands: dict = {
     "whoami": whoami,
     "get_turn": get_turn,
     "filter_champs": filter_champs,
+    "get_opponent_names": get_opponent_names,
 }
 
 cwd: str = getcwd()
@@ -179,6 +227,7 @@ if __name__ == "__main__":
 
     console.print(f"Starting server on {HOST}:{PORT}.", style=TXT_DCON)
 
+    Thread(target=play_game).start()
     accept(sock)
 
     console.print("Stopping server.")

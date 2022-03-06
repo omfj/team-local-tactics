@@ -26,7 +26,6 @@ cd team-local-tactics
 ```
 
 ### Docker
-
 1. Buld and run the database and server detached
 ```bash
 docker-compose up -d database server
@@ -38,18 +37,17 @@ docker-compose run client
 ```
 
 3. To play TLT you need two run two client. Just run the same command in another tab/window.
+
 #### Docker video
-
-
+https://user-images.githubusercontent.com/32321558/156929374-4dff4bd8-8cd6-47af-82dd-086a175befc4.mp4
 
 ## After installation
-
 1. When you're inside the container type help to get a list of all the commands
 ```bash
 >>> help
 ```
 
-Have fun!
+GL HF!
 
 # Made by group 71:
 <table>

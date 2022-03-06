@@ -202,12 +202,14 @@ TXT_DCON: str = "bold red"
 TXT_INFO: str = "bold yellow"
 
 # Self host and port
-HOST: str = ""
+#HOST: str = ""
+HOST: str = "server"
 PORT: int = 6666
 LISTEN: int = 2
 
 # Database host and port
-DB_HOST: str = ""
+#DB_HOST: str = ""
+DB_HOST: str = "database"
 DB_PORT: int = 8888
 
 # Players and lobby

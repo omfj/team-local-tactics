@@ -297,7 +297,8 @@ commands = {
 }
 
 # What HOST and PORT the socket should connect to.
-HOST: str = ""
+#HOST: str = ""
+HOST: str = "server"
 PORT: int = 6666
 
 # If name is main run this.

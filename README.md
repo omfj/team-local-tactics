@@ -25,7 +25,23 @@ git clone https://github.com/omfj/team-local-tactics.git
 cd team-local-tactics
 ```
 
-### Docker (Coming soon)
+### Docker
+
+1. Bygger alle docker filene
+```bash
+docker-compose build
+```
+
+2. Start databasen og serveren
+```bash
+docker-compose up -d database server
+```
+
+3. Start client 1 og client-2
+```bash
+docker-compose run client-1 /client.py
+docker-compose run client-2 /client.py
+```
 
 ## After installation
 

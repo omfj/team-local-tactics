@@ -39,8 +39,8 @@ docker-compose up -d database server
 
 3. Starts client 1 and client 2
 ```bash
-docker-compose run client-1 /client.py
-docker-compose run client-2 /client.py
+docker-compose run client-1
+docker-compose run client-2
 ```
 #### Docker video
 https://user-images.githubusercontent.com/32321558/156919676-ad5614f1-c39c-46df-9f79-6cdd763bdfec.mp4

@@ -43,7 +43,8 @@ docker-compose run client-1 /client.py
 docker-compose run client-2 /client.py
 ```
 #### Docker video
-![docker-video](assets/docker-demo.mp4)
+https://user-images.githubusercontent.com/32321558/156919676-ad5614f1-c39c-46df-9f79-6cdd763bdfec.mp4
+
 
 ## After installation
 

@@ -42,6 +42,8 @@ docker-compose up -d database server
 docker-compose run client-1 /client.py
 docker-compose run client-2 /client.py
 ```
+#### Docker video
+![docker-video](assets/docker-demo.mp4)
 
 ## After installation
 

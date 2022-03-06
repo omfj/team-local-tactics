@@ -15,16 +15,10 @@ services:
       - database
     ports:
       - "6666:6666"
-  client-1:
+  client:
     image: tlt-client-1:latest
     build: src/client/
     hostname: client1
     entrypoint: /client.py
     depends_on:
      - server
-  client-2:
-    image: tlt-client-2:latest
-    build: src/client/
-    hostname: client2
-    depends_on:
-      - server

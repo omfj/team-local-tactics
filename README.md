@@ -27,23 +27,19 @@ cd team-local-tactics
 
 ### Docker
 
-1. Builds all the docker files 
-```bash
-docker-compose build
-```
-
-2. Starts the database and server
+1. Buld and run the database and server detached
 ```bash
 docker-compose up -d database server
 ```
 
-3. Starts client 1 and client 2
+2. Starts a client
 ```bash
-docker-compose run client-1
-docker-compose run client-2
+docker-compose run client
 ```
+
+3. To play TLT you need two run two client. Just run the same command in another tab/window.
 #### Docker video
-https://user-images.githubusercontent.com/32321558/156919676-ad5614f1-c39c-46df-9f79-6cdd763bdfec.mp4
+
 
 
 ## After installation

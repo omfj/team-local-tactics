@@ -27,17 +27,17 @@ cd team-local-tactics
 
 ### Docker
 
-1. Bygger alle docker filene
+1. Builds all the docker files 
 ```bash
 docker-compose build
 ```
 
-2. Start databasen og serveren
+2. Starts the database and server
 ```bash
 docker-compose up -d database server
 ```
 
-3. Start client 1 og client-2
+3. Starts client 1 and client 2
 ```bash
 docker-compose run client-1 /client.py
 docker-compose run client-2 /client.py

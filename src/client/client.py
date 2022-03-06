@@ -30,6 +30,7 @@ PROMPT: str = ">>>"
 
 # Welcome message for the start of the game
 def welcome_message() -> None:
+    print()
     console.print("Welcome to", style="bold", end=" ")
     console.print("Team Local Tactics!", style=TITLE)
     console.print("Type 'help' for a list of commands.", end="\n\n")
@@ -65,6 +66,8 @@ def show_match_history(id: Optional[int or str]="all") -> None:
     match_history_database: list = get_database_content("match_history")
     if id == "all":
         match_history_overview(match_history_database)
+    elif id == "last":
+        match_history(match_history_database, -1)
     else:
         if id.isdigit():
             id = int(id, 10)
@@ -86,37 +89,38 @@ def match_history_overview(match_history_database: list) -> None:
 # TODO Rewrite when refactored
 def match_history(match_history_database: list, id: int):
     match: dict = match_history_database[id]
+
     played: str = match["time"]
-    player1_name: str = match["player1"]["name"].capitalize()
-    player2_name: str = match["player2"]["name"].capitalize()
-    player1_score: int = match["player1"]["score"]
-    player2_score: int = match["player2"]["score"]
+    players: list = match["players"]
+    score: list = match["score"]
+    players_score: list = list(zip(players, score)) # Format ([name, score], ...)
+    rounds: dict = match["rounds"]
+ 
+    console.print(' vs. '.join([f"'{player}'" for player in players]))
+    console.print(f"Played at: {played}", end="\n\n")
+
+    console.print("Scores:")
+    for player_stats in players_score:
+        console.print(f"{player_stats[0]}: {player_stats[1]}")
     
-    # Title
-    console.print(f"{player1_name} vs {player2_name}", style=f"{TITLE} underline")
-    console.print(f"Played at: {played}.")
+    print()
 
-    # Determine winner
-    if player1_score > player2_score:
-        console.print(f"{player1_name} won the game.")
-    elif player2_score > player1_score:
-        console.print(f"{player2_name} won the game.")
+    # Print out the rounds
+    for round in rounds:
+        console.print(f"Round {round}")
+        for team, champs in rounds[round].items():
+            console.print(f"{team} - {champs}")
+
+    print()
+    # Determine the winner
+    if players_score[0][1] > players_score[1][1]:
+        console.print(f"Winner: {players_score[0][0]}!")
+    elif players_score[1][1] > players_score[0][1]:
+        console.print(f"Winner: {players_score[1][0]}!")
     else:
-        console.print("It was a tie.")
+        console.print(f"It was a tie!")
 
-
-    # Score of each player
-    for i in range(1, 3):
-        print()
-        player_name: str = match[f"player{i}"]["name"].capitalize()
-        player_score: int = match[f"player{i}"]["score"]
-        player_champions: list = match[f"player{i}"]["champions"]
-        
-        console.print(player_name)
-        console.print(f"\tScore: {player_score}")
-        console.print("\tChampions:")
-        for champion in player_champions:
-            console.print(f"\t\t{champion.capitalize()}")
+    
 
 # TODO Kan vente med denne
 # If the command is not recognized, print an error message. Also try to find what command the user meant.
@@ -256,19 +260,21 @@ def start_game() -> None:
 def end_game() -> None:
     with console.status("[green]Your opponent is picking a champion...") as status:
         while int(send_recieve("total_picked")) < 4:
-            sleep(0.5)
+            sleep(1)
         else:
             status.stop()
             with console.status("[bold green]Playing the game...") as status:
                 while sock.recv(1024).decode() != "game_end":
                         sleep(1)
                 else:
+                    status.stop()
+                    show_match_history("last")
                     console.print("GG WP!")
         
 
 def send_recieve(command: str) -> str:
     sock.sendall(command.encode())
-    return sock.recv(1024).decode()
+    return sock.recv(8024).decode()
 
 # All the possible commands the user can use, and their methods
 commands = {
@@ -297,18 +303,17 @@ commands = {
 }
 
 # What HOST and PORT the socket should connect to.
-#HOST: str = ""
-HOST: str = "server"
+#HOST: str = "" # Uncomment to run when not in docker
+HOST: str = "server" # Comment this if you uncomment the above
 PORT: int = 6666
 
 # If name is main run this.
 if __name__ == "__main__":
-    print()
+    welcome_message()
 
     try:
         sock: socket = create_connection((HOST, PORT))
         help_database = get_database_content("help")
-        welcome_message()
     except ConnectionRefusedError:
         console.print("Could not connect to the server.", style=ERR_CLR)
 

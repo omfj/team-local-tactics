@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 from socket import socket, create_connection
-from game_logic import Champion, Match, Team
+from game_logic import Champion, Match, Team, Shape
+from datetime import datetime
 from threading import Thread
 from rich.console import Console
 from time import sleep
@@ -45,32 +46,69 @@ def start_lobby(conn: socket, name: str) -> None:
 def play_game() -> None:
 
     while total_picked_server() < 4:
-        sleep(5)
+        sleep(3)
     else:
         match: Match = Match(
             Team([parse_champion(champion) for champion in lobby[0][2]]),
             Team([parse_champion(champion) for champion in lobby[1][2]])
         )
-
         match.play()
-        console.log(match)
-        db_conn.send(f"append_match {match}".encode())
+        send_match_summary(match, [player[1] for player in lobby])
 
         for player in lobby:
+            sleep(0.2) # Or else databse and server get overwhelmed
             player[0].send("game_end".encode())
 
         console.log("Match is over!")
         lobby.clear()
+        if len(lobby) == 0:
+            console.log("Lobby is empty.")
+        
+        play_game()
+
+def send_match_summary(match: Match, players: list) -> None:
+
+    match_summary: dict = {}
+
+    EMOJI = {
+        Shape.ROCK: ':raised_fist-emoji:',
+        Shape.PAPER: ':raised_hand-emoji:',
+        Shape.SCISSORS: ':victory_hand-emoji:'
+    }
+
+    now = datetime.now()
+    date_time = now.strftime("%d/%m %H:%M")
+
+    match_summary["time"] = date_time
+    match_summary["players"] = [player for player in players]
+    match_summary["score"] = [score for score in match.score]
+    match_summary["rounds"] = {}
+
+    for index, round in enumerate(match.rounds):
+
+        # Create a table containing the results of the round
+        match_summary["rounds"][f"{index+1}"] = {}
+
+        for key in round:
+            red, blue = key.split(', ')
+            match_summary["rounds"][f"{index+1}"]["red"] = f"{red} {EMOJI[round[key].red]}"
+            match_summary["rounds"][f"{index+1}"]["blue"] = f"{blue} {EMOJI[round[key].blue]}"
+
+    console.log(f"Sending to database: append_database match_history {match_summary}")
+    db_conn.sendall(f"append_database match_history {match_summary}".encode())
 
 
-def parse_champion(champion_name: str) -> tuple[str, float, float, float]:
+def parse_champion(champion: dict) -> Champion:
     name: str; rock: int; paper: int; scissors: int
-    name = champion_name["name"]
-    rock = champion_name["abilities"]["rock"] / 100
-    paper = champion_name["abilities"]["paper"] / 100
-    scissors = champion_name["abilities"]["scissors"] / 100
 
-    return name, rock, paper, scissors
+    console.log(champion)
+
+    name = champion["name"]
+    rock = champion["abilities"]["rock"] / 100
+    paper = champion["abilities"]["paper"] / 100
+    scissors = champion["abilities"]["scissors"] / 100
+
+    return Champion(name, rock, paper, scissors)
 
 def add_champion(conn: socket, champion: str) -> None:
     for player in lobby:
@@ -202,14 +240,14 @@ TXT_DCON: str = "bold red"
 TXT_INFO: str = "bold yellow"
 
 # Self host and port
-#HOST: str = ""
-HOST: str = "server"
+HOST: str = "" # Uncomment to run when not in docker
+#HOST: str = "server" # Comment this if you uncomment the above
 PORT: int = 6666
 LISTEN: int = 2
 
 # Database host and port
-#DB_HOST: str = ""
-DB_HOST: str = "database"
+#DB_HOST: str = "" # Uncomment to run when not in docker
+DB_HOST: str = "database" # Comment this if you uncomment the above
 DB_PORT: int = 8888
 
 # Players and lobby

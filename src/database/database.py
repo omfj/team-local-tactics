@@ -23,9 +23,19 @@ def read_database(conn: socket, address: tuple, database_name: str) -> None:
     conn.sendall(database_content.encode())
 
 # Append the content to the database
-def append_database(database_name: str, content: str) -> None:
-    with open(f"{database_name}.yaml", "a") as f:
-        pass # Logic here
+def append_database(*args: any) -> None:
+    address: tuple = args[1]
+    database_name: str; content: str
+    database_name, content = args[2].split(" ", 1)
+
+    with open(f"{database_name}.yaml", "r") as f:
+        match_history = yaml.load(f, Loader=yaml.FullLoader)
+        match_history.append(eval(content))
+    f.close()
+
+    console.log(f"{address} appended {content} to the database '{database_name}'", style=TXT_INFO)
+    with open(f"{database_name}.yaml", "w") as f:
+        yaml.dump(match_history, f, default_flow_style=False, allow_unicode=True)
     f.close()
 
 ##### SOCKET LOGIC #####
@@ -40,19 +50,19 @@ def accept(sock: str) -> None:
 # Read the incoming connections
 def read(conn: socket, address: tuple) -> None:
     while True:
-        client_input: bytes = conn.recv(1024)
+        client_input: bytes = conn.recv(8024)
 
         if client_input:
             client_input_decoded: str = client_input.decode()
-            command: str; arg: str
-            command, arg = (client_input_decoded + " ").split(" ", 1)
-            arg = " ".join(arg.strip().split(" "))
+            command: str; args: str
+            command, args = (client_input_decoded + " ").split(" ", 1)
+            args = " ".join(args.strip().split(" "))
 
             # If command exists and the command has an argument
-            if command in commands and arg:
-                commands[command](conn, address,  arg)
+            if command in commands and args:
+                commands[command](conn, address, args)
             else:
-                console.log(f"{address}, sent a command that does not exist: [{command}, {arg}]", style=TXT_INFO)
+                console.log(f"{address}, sent a command that does not exist: [{command}, {args}]", style=TXT_INFO)
         else:
             console.log(f"{address} has disconnected.", style=TXT_DCON)
             conn.close()
@@ -66,8 +76,8 @@ commands: dict[str, Any] = {
 }
 
 # Host and port
-#HOST: str = ""
-HOST: str = "database"
+#HOST: str = "" # Uncomment to run when not in docker
+HOST: str = "database" # Comment this if you uncomment the above
 PORT: int = 8888
 
 # Rich

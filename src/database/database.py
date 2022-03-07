@@ -25,9 +25,10 @@ def read_database(conn: socket, address: tuple, args: any) -> None:
     conn.sendall(database_content.encode())
 
 # Append the content to the database
-def append_database(_: any, address: tuple, args: any) -> None:
-    database_name: str = args[0]
-    content: str = args[1]
+def append_database(*args: any) -> None:
+    address: tuple = args[1]
+    database_name: str; content: str
+    database_name, content = args[2].split(" ", 1)
 
     console.log(f"{address} appended {content} to the database '{database_name}'", style=TXT_INFO)
     with open(f"{database_name}.yaml", "a") as f:

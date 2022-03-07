@@ -90,10 +90,9 @@ def send_match_summary(match: Match, players: list) -> None:
         match_summary["rounds"][f"{index+1}"] = {}
 
         for key in round:
-            red, blue = key.split(', ')
-            match_summary["rounds"][f"{index+1}"]["red"] = f"{red} {EMOJI[round[key].red]}"
-            match_summary["rounds"][f"{index+1}"]["blue"] = f"{blue} {EMOJI[round[key].blue]}"
-
+            player1, player2 = key.split(', ')
+            match_summary["rounds"][f"{index+1}"]["red"] = f"{player1} {EMOJI[round[key].red]}"
+            match_summary["rounds"][f"{index+1}"]["blue"] = f"{player2} {EMOJI[round[key].blue]}"
     console.log(f"Sending to database: append_database match_history {match_summary}")
     db_conn.sendall(f"append_database match_history {match_summary}".encode())
 

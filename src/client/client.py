@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 from rich.table import Table
 from rich.console import Console
@@ -95,30 +96,46 @@ def match_history(match_history_database: list, id: int):
     score: list = match["score"]
     players_score: list = list(zip(players, score)) # Format ([name, score], ...)
     rounds: dict = match["rounds"]
- 
-    console.print(' vs. '.join([f"'{player}'" for player in players]))
+
+
+    console.print(f"Match ID {id}")
+    console.print(' vs. '.join([f"'{player.capitalize()}'" for player in players]))
     console.print(f"Played at: {played}", end="\n\n")
 
-    console.print("Scores:")
-    for player_stats in players_score:
-        console.print(f"{player_stats[0]}: {player_stats[1]}")
+
+
+    round_table = Table(title="The Match", header_style=T_H_CLR)
+    for round in rounds:
+        console.print(f"Round {round}", justify="left", style=T_B_CLR)
+        for team, champs in rounds[round].items():
+            console.print(f"{team.capitalize()} - {champs.capitalize()}")
+    console.print(round_table)
+    print()
     
+    player_scores = Table(title="Final Score", header_style=INF_CLR)
+    for player_stats in players_score:
+        player_scores.add_column(f"{player_stats[0]}: {player_stats[1]}")
+    console.print(player_scores)
     print()
 
     # Print out the rounds
-    for round in rounds:
-        console.print(f"Round {round}")
-        for team, champs in rounds[round].items():
-            console.print(f"{team} - {champs}")
+    #for round in rounds:
+        #console.print(f"Round {round}")
+        #for team, champs in rounds[round].items():
+            #console.print(f"{team} - {champs}")
 
-    print()
+    #print()
     # Determine the winner
-    if players_score[0][1] > players_score[1][1]:
-        console.print(f"Winner: {players_score[0][0]}!")
+    if players_score[0][1] == 6:
+        console.print(f"Winner: {players_score[0][0].capitalize()}! GG EZ")
+    elif players_score[1][1] == 6:
+        console.print(f"Winner: {players_score[1][0].capitalize()}! GG EZ")
+    elif players_score[0][1] > players_score[1][1]:
+        console.print(f"Winner: {players_score[0][0].capitalize()}! GG WP")
     elif players_score[1][1] > players_score[0][1]:
-        console.print(f"Winner: {players_score[1][0]}!")
+        console.print(f"Winner: {players_score[1][0].capitalize()}! GG WP")
     else:
-        console.print(f"It was a tie!")
+        console.print(f"It was a tie! GG WP")
 
     
 
@@ -186,7 +203,8 @@ def get_database_content(database_name: str) -> str:
 def start_lobby() -> None:
     console.print("Welcome players, to Team Local Tactics!", style=TITLE)
     console.print("Press <Ctrl> + <C> to exit at any time during the champion selection.", style="underline", end="\n\n")
-
+    for _ in track(range(10), description="Printing champions..."):
+        sleep(0.5)
     print_all_champions()
 
     player_name: str = prompt.ask("Summoner, what is your name?") 
@@ -199,6 +217,8 @@ def start_lobby() -> None:
     with console.status("[bold green]Searching for a challenger...", spinner="earth") as status:
         if send_recieve(f"start_lobby {player_name}") == "lobby_found":
             status.stop()
+            for _ in track(range(10), description="Starting game..."):
+                sleep(0.5)
             start_game()
 
 

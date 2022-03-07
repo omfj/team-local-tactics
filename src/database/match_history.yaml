@@ -1,106 +1,4 @@
 - players:
-  - eirik
-  - ole magnus
-  rounds:
-    '1':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-    '2':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-    '3':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-  score:
-  - 5
-  - 1
-  time: some time
-- players:
-  - eirik
-  - ole magnus
-  rounds:
-    '1':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-    '2':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-    '3':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-  score:
-  - 5
-  - 1
-  time: some time
-- players:
-  - Player 1
-  - Player 2
-  rounds:
-    '1':
-      blue: 'twist :raised_hand-emoji:'
-      red: 'guan :raised_fist-emoji:'
-    '2':
-      blue: 'twist :victory_hand-emoji:'
-      red: 'vain :raised_hand-emoji:'
-    '3':
-      blue: 'twist :victory_hand-emoji:'
-      red: 'guan :raised_hand-emoji:'
-  score:
-  - 2
-  - 4
-  time: 06/03 20:07
-- players:
-  - eirik
-  - ole magnus
-  rounds:
-    '1':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-    '2':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-    '3':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-  score:
-  - 5
-  - 1
-  time: some time
-- players:
-  - Player 1
-  - Player 2
-  rounds:
-    '1':
-      blue: 'asir :victory_hand-emoji:'
-      red: 'vain :raised_hand-emoji:'
-    '2':
-      blue: 'katina :raised_hand-emoji:'
-      red: 'vain :raised_fist-emoji:'
-    '3':
-      blue: 'katina :victory_hand-emoji:'
-      red: 'cactus :raised_hand-emoji:'
-  score:
-  - 2
-  - 4
-  time: 06/03 20:25
-- players:
-  - Player 1
-  - Player 2
-  rounds:
-    '1':
-      blue: 'cactus :raised_hand-emoji:'
-      red: 'vain :raised_fist-emoji:'
-    '2':
-      blue: 'cactus :raised_hand-emoji:'
-      red: 'siva :raised_fist-emoji:'
-    '3':
-      blue: 'cactus :raised_hand-emoji:'
-      red: 'vain :raised_fist-emoji:'
-  score:
-  - 1
-  - 5
-  time: 06/03 20:28
-- players:
   - vain
   - sda
   rounds:
@@ -117,3 +15,37 @@
   - 0
   - 6
   time: 06/03 20:29
+- players:
+  - Olis Magnis
+  - ogisbogis
+  rounds:
+    '1':
+      blue: 'asir :victory_hand-emoji:'
+      red: 'cactus :raised_hand-emoji:'
+    '2':
+      blue: 'asir :victory_hand-emoji:'
+      red: 'siva :raised_fist-emoji:'
+    '3':
+      blue: 'twist :victory_hand-emoji:'
+      red: 'cactus :raised_hand-emoji:'
+  score:
+  - 2
+  - 4
+  time: 07/03 09:52
+- players:
+  - Player 1
+  - Player 2
+  rounds:
+    '1':
+      blue: 'vain :raised_hand-emoji:'
+      red: 'asir :victory_hand-emoji:'
+    '2':
+      blue: 'vain :raised_fist-emoji:'
+      red: 'asir :victory_hand-emoji:'
+    '3':
+      blue: 'siva :raised_hand-emoji:'
+      red: 'twist :raised_fist-emoji:'
+  score:
+  - 3
+  - 3
+  time: 07/03 09:54

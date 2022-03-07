@@ -28,14 +28,9 @@ def append_database(*args: any) -> None:
     database_name: str; content: str
     database_name, content = args[2].split(" ", 1)
 
-    with open(f"{database_name}.yaml", "r") as f:
-        match_history = yaml.load(f, Loader=yaml.FullLoader)
-        match_history.append(eval(content))
-    f.close()
-
     console.log(f"{address} appended {content} to the database '{database_name}'", style=TXT_INFO)
-    with open(f"{database_name}.yaml", "w") as f:
-        yaml.dump(match_history, f, default_flow_style=False, allow_unicode=True)
+    with open(f"{database_name}.yaml", "a") as f:
+        yaml.dump([eval(content)], f, default_flow_style=False, allow_unicode=True)
     f.close()
 
 ##### SOCKET LOGIC #####

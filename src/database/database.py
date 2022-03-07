@@ -54,10 +54,6 @@ def read(conn: socket, address: tuple) -> None:
             command, args = (client_input_decoded + " ").split(" ", 1)
             args = args.strip().split(" ", 1)
 
-            print(client_input_decoded)
-            print(command)
-            print(args)
-
             # If command exists and the command has an argument
             if command in commands and args:
                 commands[command](conn, address, args)
@@ -76,8 +72,8 @@ commands: dict[str, Any] = {
 }
 
 # Host and port
-HOST: str = "" # Uncomment to run when not in docker
-#HOST: str = "database" # Comment this if you uncomment the above
+#HOST: str = "" # Uncomment to run when not in docker
+HOST: str = "database" # Comment this if you uncomment the above
 PORT: int = 8888
 
 # Rich

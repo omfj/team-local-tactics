@@ -303,8 +303,8 @@ commands = {
 }
 
 # What HOST and PORT the socket should connect to.
-#HOST: str = "" # Uncomment to run when not in docker
-HOST: str = "server" # Comment this if you uncomment the above
+HOST: str = "" # Uncomment to run when not in docker
+#HOST: str = "server" # Comment this if you uncomment the above
 PORT: int = 6666
 
 # If name is main run this.

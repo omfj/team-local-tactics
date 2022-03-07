@@ -49,3 +49,20 @@
   - 3
   - 3
   time: 07/03 09:54
+- players:
+  - Player 1
+  - Player 2
+  rounds:
+    '1':
+      blue: 'asir :victory_hand-emoji:'
+      red: 'guan :raised_fist-emoji:'
+    '2':
+      blue: 'asir :raised_hand-emoji:'
+      red: 'siva :raised_fist-emoji:'
+    '3':
+      blue: 'vain :victory_hand-emoji:'
+      red: 'siva :raised_fist-emoji:'
+  score:
+  - 2
+  - 4
+  time: 07/03 11:43

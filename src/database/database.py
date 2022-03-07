@@ -14,7 +14,9 @@ TXT_DCON: str = "bold red"
 
 ##### DATABASE LOGIC #####
 # Read the database and return the contents as a string
-def read_database(conn: socket, address: tuple, database_name: str) -> None:
+def read_database(conn: socket, address: tuple, args: any) -> None:
+    database_name: str = args[0]
+
     console.log(f"{address} asked for the database '{database_name}'", style=TXT_INFO)
     with open(f"{database_name}.yaml", "r") as f:
         database_content: list = yaml.load(f, Loader=yaml.FullLoader)
@@ -23,10 +25,9 @@ def read_database(conn: socket, address: tuple, database_name: str) -> None:
     conn.sendall(database_content.encode())
 
 # Append the content to the database
-def append_database(*args: any) -> None:
-    address: tuple = args[1]
-    database_name: str; content: str
-    database_name, content = args[2].split(" ", 1)
+def append_database(_: any, address: tuple, args: any) -> None:
+    database_name: str = args[0]
+    content: str = args[1]
 
     console.log(f"{address} appended {content} to the database '{database_name}'", style=TXT_INFO)
     with open(f"{database_name}.yaml", "a") as f:
@@ -51,7 +52,11 @@ def read(conn: socket, address: tuple) -> None:
             client_input_decoded: str = client_input.decode()
             command: str; args: str
             command, args = (client_input_decoded + " ").split(" ", 1)
-            args = " ".join(args.strip().split(" "))
+            args = args.strip().split(" ", 1)
+
+            print(client_input_decoded)
+            print(command)
+            print(args)
 
             # If command exists and the command has an argument
             if command in commands and args:

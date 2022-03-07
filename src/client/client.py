@@ -102,37 +102,25 @@ def match_history(match_history_database: list, id: int):
 
 
     console.print(f"Match ID {id}")
-    console.print(' vs. '.join([f"'{player.capitalize()}'" for player in players])) #Prints the players who played eachother
-    console.print(f"Played at: {played}", end="\n\n") #Prints the time they played at
+    console.print(' vs. '.join([f"'{player.capitalize()}'" for player in players]))
+    console.print(f"Played at: {played}", end="\n\n")
 
-    # Prints a rich table of all the rounds and which champion played against who, aswell as who won.
-    teams_list = []
-    champs_list = []
+
+
     round_table = Table(title="The Match", header_style=T_H_CLR)
     for round in rounds:
-        round_table.add_column(f"Round {round}", justify="left", style=T_B_CLR)
+        console.print(f"Round {round}", justify="left", style=T_B_CLR)
         for team, champs in rounds[round].items():
-            teams_list.append(team)
-            champs_list.append(champs)
-            round_table.add_row(f"{team.capitalize()} - {champs.capitalize()}")
-    #console.print(round_table)
-    #console.print(teams_list)
-    #console.print(champs_list)
-
-    # Prints a table of the final score of the players, aswell with a little message to the user.
+            console.print(f"{team.capitalize()} - {champs.capitalize()}")
+    console.print(round_table)
+    print()
+    
     player_scores = Table(title="Final Score", header_style=INF_CLR)
     for player_stats in players_score:
         player_scores.add_column(f"{player_stats[0]}: {player_stats[1]}")
-    
-    if players_score[0][1] > players_score[1][1]: #If player 1 won and player 2 lost.
-        player_scores.add_row("Well played, Summoner!", "Better luck next time, kiddo.")
-    elif players_score[0][1] < players_score[1][1]: #If player 2 won and player 1 lost.
-        player_scores.add_row("Better luck next time, kiddo.", "Well played, Summoner!")
-    else: #If it is a draw
-        player_scores.add_row("You are Even Steven.", "You are Even Steven.")
-        
     console.print(player_scores)
     print()
+
     # Print out the rounds
     #for round in rounds:
         #console.print(f"Round {round}")
@@ -140,7 +128,7 @@ def match_history(match_history_database: list, id: int):
             #console.print(f"{team} - {champs}")
 
     #print()
-    # Determines the winner. Prints 'GG EZ' if either player managed to get zero points.
+    # Determine the winner
     if players_score[0][1] == 6:
         console.print(f"Winner: {players_score[0][0].capitalize()}! GG EZ")
     elif players_score[1][1] == 6:
@@ -224,9 +212,12 @@ def start_lobby() -> None:
     console.print("Press <Ctrl> + <C> to exit at any time during the champion selection.", style="underline", end="\n\n")
     for _ in track(range(10), description="Printing champions..."):
         sleep(0.5)
+<<<<<<< HEAD
 
     print()
 
+=======
+>>>>>>> d46002d (:zap: Endret på match_history for å se bedre ut)
     print_all_champions()
 
     player_name: str = prompt.ask("Summoner, what is your name?") # Ask player for name input
@@ -242,10 +233,15 @@ def start_lobby() -> None:
     with console.status("[bold green]Searching for a challenger...", spinner="earth") as status:
         if send_recieve(f"start_lobby {player_name}") == "lobby_found":
             status.stop()
+<<<<<<< HEAD
             for _ in track(range(10), description="Loading Champion Selection..."):
                 sleep(0.5)
             print()
 
+=======
+            for _ in track(range(10), description="Starting game..."):
+                sleep(0.5)
+>>>>>>> d46002d (:zap: Endret på match_history for å se bedre ut)
             start_game()
 
 

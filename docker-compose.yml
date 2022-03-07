@@ -1,13 +1,24 @@
 version: '1.0'
 
 services:
+  database:
+    image: tlt-database:latest
+    build: src/database/
+    hostname: database
+    ports:
+      - "8888:8888"
   server:
     image: tlt-server:latest
-    build: src/server/.
+    build: src/server/
+    hostname: server
+    depends_on:
+      - database
     ports:
-      - "0000:6666"
-  client-1:
+      - "6666:6666"
+  client:
     image: tlt-client-1:latest
-    build: src/client/.
-    ports:
-      - "0000:6666"
+    build: src/client/
+    hostname: client1
+    entrypoint: /client.py
+    depends_on:
+     - server

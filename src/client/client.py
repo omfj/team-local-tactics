@@ -94,56 +94,47 @@ def match_history(match_history_database: list, id: int):
 
     # Variables from the match_history dictionary
     # Sorted into variables, easier to handle
-    played: str = match["time"]
+    time: str = match["time"]
     players: list = match["players"]
-    score: list = match["score"]
-    players_score: list = list(zip(players, score)) # Format ([name, score], ...)
     rounds: dict = match["rounds"]
 
+    # List of each players champions
+    #player1_champs: list; player2_champs: list
+    #player1_champs = players[0]["champions"]
+    #player2_champs = players[1]["champions"]
 
-    console.print(f"Match ID {id}")
-    console.print(' vs. '.join([f"'{player.capitalize()}'" for player in players]))
-    console.print(f"Played at: {played}", end="\n\n")
+    # Get each players score
+    player1_score: str; player2_score: str
+    player1_score = players[0]["score"]
+    player2_score = players[1]["score"]
 
+    console.print(' vs. '.join([f"'{player['name'].capitalize()}'" for player in players]))
+    console.print(f"Played at: {time}", end="\n\n")
 
-
-    round_table = Table(title="The Match", header_style=T_H_CLR)
+    # Make one table for each round. The tables includes the info about that round
     for round in rounds:
-        console.print(f"Round {round}", justify="left", style=T_B_CLR)
-        for team, champs in rounds[round].items():
-            console.print(f"{team.capitalize()} - {champs.capitalize()}")
-    console.print(round_table)
-    print()
-    
-    player_scores = Table(title="Final Score", header_style=INF_CLR)
-    for player_stats in players_score:
-        player_scores.add_column(f"{player_stats[0]}: {player_stats[1]}")
-    console.print(player_scores)
-    print()
+        round_table = Table(title=f"Round {round}")
 
-    # Print out the rounds
-    #for round in rounds:
-        #console.print(f"Round {round}")
-        #for team, champs in rounds[round].items():
-            #console.print(f"{team} - {champs}")
+        for player in players:
+            round_table.add_column(player["name"], style=T_B_CLR)
 
-    #print()
+        for desc in rounds[round]:
+            player1_desc, player2_desc = desc.split(" vs ")
+            round_table.add_row(player1_desc, player2_desc)
+            
+
+        console.print(round_table)
+        sleep(0.2)
+
     # Determine the winner
-    if players_score[0][1] == 6:
-        console.print(f"Winner: {players_score[0][0].capitalize()}! GG EZ")
-    elif players_score[1][1] == 6:
-        console.print(f"Winner: {players_score[1][0].capitalize()}! GG EZ")
-    elif players_score[0][1] > players_score[1][1]:
-        console.print(f"Winner: {players_score[0][0].capitalize()}! GG WP")
-    elif players_score[1][1] > players_score[0][1]:
-        console.print(f"Winner: {players_score[1][0].capitalize()}! GG WP")
+    if player1_score < player2_score:
+        console.print(f"{players[1]['name']} won the game!")
+    elif player2_score < player1_score:
+        console.print(f"{players[0]['name']} won the game!")
     else:
-        console.print(f"It was a tie! GG WP")
-
-    
+        console.print(f"It was a tie!")
 
 # If the command is not recognized, print an error message. Also try to find what command the user meant.
-
 def error_command(command: str) -> None:
     console.print(f"Unknown command: '{command}'.", style=ERR_CLR)
 
@@ -212,12 +203,6 @@ def start_lobby() -> None:
     console.print("Press <Ctrl> + <C> to exit at any time during the champion selection.", style="underline", end="\n\n")
     for _ in track(range(10), description="Printing champions..."):
         sleep(0.5)
-<<<<<<< HEAD
-
-    print()
-
-=======
->>>>>>> d46002d (:zap: Endret på match_history for å se bedre ut)
     print_all_champions()
 
     player_name: str = prompt.ask("Summoner, what is your name?") # Ask player for name input
@@ -233,15 +218,6 @@ def start_lobby() -> None:
     with console.status("[bold green]Searching for a challenger...", spinner="earth") as status:
         if send_recieve(f"start_lobby {player_name}") == "lobby_found":
             status.stop()
-<<<<<<< HEAD
-            for _ in track(range(10), description="Loading Champion Selection..."):
-                sleep(0.5)
-            print()
-
-=======
-            for _ in track(range(10), description="Starting game..."):
-                sleep(0.5)
->>>>>>> d46002d (:zap: Endret på match_history for å se bedre ut)
             start_game()
 
 
@@ -349,8 +325,8 @@ commands = {
 }
 
 # What HOST and PORT the socket should connect to.
-#HOST: str = "" # Uncomment to run when not in docker
-HOST: str = "server" # Comment this if you uncomment the above
+HOST: str = "" # Uncomment to run when not in docker
+#HOST: str = "server" # Comment this if you uncomment the above
 PORT: int = 6666
 
 # If name is main run this.

@@ -1,23 +1,44 @@
 - players:
   - champions:
-    - twist
-    - guan
-    name: Player 1
-  - champions:
     - vain
-    - asir
+    - katina
+    name: Player 1
+    score: 3
+  - champions:
+    - twist
+    - siva
     name: Player 2
+    score: 3
   rounds:
     '1':
-    - 'guan :raised_fist-emoji: vs asir :victory_hand-emoji:'
-    - 'twist :victory_hand-emoji: vs vain :raised_hand-emoji:'
+    - 'katina :raised_hand-emoji: vs siva :raised_fist-emoji:'
+    - 'vain :raised_fist-emoji: vs twist :victory_hand-emoji:'
     '2':
-    - 'twist :raised_hand-emoji: vs asir :victory_hand-emoji:'
-    - 'guan :raised_fist-emoji: vs vain :raised_hand-emoji:'
+    - 'katina :raised_hand-emoji: vs twist :victory_hand-emoji:'
+    - 'vain :raised_fist-emoji: vs siva :raised_hand-emoji:'
     '3':
-    - 'twist :raised_fist-emoji: vs asir :victory_hand-emoji:'
-    - 'guan :victory_hand-emoji: vs vain :raised_hand-emoji:'
-  score:
-  - 4
-  - 2
-  time: 08/03 18:48
+    - 'vain :raised_fist-emoji: vs twist :victory_hand-emoji:'
+    - 'katina :victory_hand-emoji: vs siva :raised_fist-emoji:'
+  time: 08/03 19:23
+- players:
+  - champions:
+    - twist
+    - siva
+    name: Player 1
+    score: 3
+  - champions:
+    - vain
+    - guan
+    name: Player 2
+    score: 3
+  rounds:
+    '1':
+    - 'twist :victory_hand-emoji: vs vain :raised_hand-emoji:'
+    - 'siva :raised_fist-emoji: vs guan :raised_hand-emoji:'
+    '2':
+    - 'twist :raised_fist-emoji: vs vain :raised_hand-emoji:'
+    - 'siva :victory_hand-emoji: vs guan :raised_hand-emoji:'
+    '3':
+    - 'siva :raised_fist-emoji: vs vain :raised_hand-emoji:'
+    - 'twist :raised_fist-emoji: vs guan :victory_hand-emoji:'
+  time: 08/03 20:09

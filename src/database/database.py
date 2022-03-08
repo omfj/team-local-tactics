@@ -72,8 +72,8 @@ commands: dict[str, Any] = {
 }
 
 # Host and port
-#HOST: str = "" # Uncomment to run when not in docker
-HOST: str = "database" # Comment this if you uncomment the above
+HOST: str = "" # Uncomment to run when not in docker
+#HOST: str = "database" # Comment this if you uncomment the above
 PORT: int = 8888
 
 # Rich

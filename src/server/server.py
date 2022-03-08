@@ -82,16 +82,12 @@ def send_match_summary(match: Match, players: list) -> None:
     match_summary["time"] = date_time
 
     match_summary["players"] = []
-
-    for player in players:
+    for index, player in enumerate(players):
         name = player[0]
         champions = player[1]
-        match_summary["players"].append({"name": name, "champions": [champion["name"] for champion in champions]})
+        match_summary["players"].append({"name": name, "champions": [champion["name"] for champion in champions], "score": match.score[index]})
 
-
-    match_summary["score"] = [score for score in match.score]
     match_summary["rounds"] = {}
-
     for index, round in enumerate(match.rounds):
         n_round = index + 1
         match_summary["rounds"][f"{n_round}"] = []
@@ -247,14 +243,14 @@ TXT_DCON: str = "bold red"
 TXT_INFO: str = "bold yellow"
 
 # Self host and port
-#HOST: str = "" # Uncomment to run when not in docker
-HOST: str = "server" # Comment this if you uncomment the above
+HOST: str = "" # Uncomment to run when not in docker
+#HOST: str = "server" # Comment this if you uncomment the above
 PORT: int = 6666
 LISTEN: int = 2
 
 # Database host and port
-#DB_HOST: str = "" # Uncomment to run when not in docker
-DB_HOST: str = "database" # Comment this if you uncomment the above
+DB_HOST: str = "" # Uncomment to run when not in docker
+#DB_HOST: str = "database" # Comment this if you uncomment the above
 DB_PORT: int = 8888
 
 # Players and lobby

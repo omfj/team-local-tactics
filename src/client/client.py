@@ -36,7 +36,7 @@ def welcome_message() -> None:
     console.print("Team Local Tactics!", style=TITLE)
     console.print("Type 'help' for a list of commands.", end="\n\n")
 
-# Clears the screen if the operatingsystem is unix-like. *Issues on windows
+# Clears the screen if the operatingsystem is unix-like. *Issues on windows CMD.
 def clear_screen() -> None:
     if os.name == "posix":
         os.system("clear")
@@ -62,9 +62,10 @@ def help_message(command_name="all") -> None:
     else:
         console.print(f"Unknown command: '{command_name}'. Remember you can't use aliases on with the help command.", style=ERR_CLR)
 
-# Prints the match history. By default it prints an overview, but you can get all the details for a specific match by typing 'match <match_id>'
+# Prints the match history. By default it prints an overview, but you can get 
+# all the details for a specific match by typing 'match <match_id>'
 def show_match_history(id: Optional[int or str]="all") -> None:
-    match_history_database: list = get_database_content("match_history")
+    match_history_database: list = get_database_content("match_history") #Gets the match history from the database
     if id == "all":
         match_history_overview(match_history_database)
     elif id == "last":
@@ -74,7 +75,7 @@ def show_match_history(id: Optional[int or str]="all") -> None:
             id = int(id, 10)
             try:
                 match_history(match_history_database, id)
-            except IndexError:
+            except IndexError: #If user enters invalid Match ID. A match that hasn't been played yet.
                 console.print(f"Match does not exist. '{id}' is an invalid ID.", style=ERR_CLR)
         else:
             console.print(f"Match does not exist. '{id}' is an invalid ID.", style=ERR_CLR)
@@ -86,11 +87,13 @@ def match_history_overview(match_history_database: list) -> None:
     for id, match in enumerate(match_history_database):
         console.print(f"Match: {match['time']} | ID: {id}")
 
-# Display the match 
-# TODO Rewrite when refactored
+# This function displays the match. It shows the match ID, the players who played,
+# their champions, what the match results were for each round aswell as the final score.
 def match_history(match_history_database: list, id: int):
     match: dict = match_history_database[id]
 
+    # Variables from the match_history dictionary
+    # Sorted into variables, easier to handle
     played: str = match["time"]
     players: list = match["players"]
     score: list = match["score"]
@@ -99,25 +102,37 @@ def match_history(match_history_database: list, id: int):
 
 
     console.print(f"Match ID {id}")
-    console.print(' vs. '.join([f"'{player.capitalize()}'" for player in players]))
-    console.print(f"Played at: {played}", end="\n\n")
+    console.print(' vs. '.join([f"'{player.capitalize()}'" for player in players])) #Prints the players who played eachother
+    console.print(f"Played at: {played}", end="\n\n") #Prints the time they played at
 
-
-
+    # Prints a rich table of all the rounds and which champion played against who, aswell as who won.
+    teams_list = []
+    champs_list = []
     round_table = Table(title="The Match", header_style=T_H_CLR)
     for round in rounds:
-        console.print(f"Round {round}", justify="left", style=T_B_CLR)
+        round_table.add_column(f"Round {round}", justify="left", style=T_B_CLR)
         for team, champs in rounds[round].items():
-            console.print(f"{team.capitalize()} - {champs.capitalize()}")
-    console.print(round_table)
-    print()
-    
+            teams_list.append(team)
+            champs_list.append(champs)
+            round_table.add_row(f"{team.capitalize()} - {champs.capitalize()}")
+    #console.print(round_table)
+    #console.print(teams_list)
+    #console.print(champs_list)
+
+    # Prints a table of the final score of the players, aswell with a little message to the user.
     player_scores = Table(title="Final Score", header_style=INF_CLR)
     for player_stats in players_score:
         player_scores.add_column(f"{player_stats[0]}: {player_stats[1]}")
+    
+    if players_score[0][1] > players_score[1][1]: #If player 1 won and player 2 lost.
+        player_scores.add_row("Well played, Summoner!", "Better luck next time, kiddo.")
+    elif players_score[0][1] < players_score[1][1]: #If player 2 won and player 1 lost.
+        player_scores.add_row("Better luck next time, kiddo.", "Well played, Summoner!")
+    else: #If it is a draw
+        player_scores.add_row("You are Even Steven.", "You are Even Steven.")
+        
     console.print(player_scores)
     print()
-
     # Print out the rounds
     #for round in rounds:
         #console.print(f"Round {round}")
@@ -125,7 +140,7 @@ def match_history(match_history_database: list, id: int):
             #console.print(f"{team} - {champs}")
 
     #print()
-    # Determine the winner
+    # Determines the winner. Prints 'GG EZ' if either player managed to get zero points.
     if players_score[0][1] == 6:
         console.print(f"Winner: {players_score[0][0].capitalize()}! GG EZ")
     elif players_score[1][1] == 6:
@@ -139,18 +154,18 @@ def match_history(match_history_database: list, id: int):
 
     
 
-# TODO Kan vente med denne
 # If the command is not recognized, print an error message. Also try to find what command the user meant.
+
 def error_command(command: str) -> None:
     console.print(f"Unknown command: '{command}'.", style=ERR_CLR)
 
-    possible_commands: list = []
-    for known_command in commands:
-        if command in known_command:
-            possible_commands.append(f"'{known_command}'")
+    possible_commands: list = [] # Empty list which will be appended to
+    for known_command in commands: # Here, commands is the dictionary on line 320.
+        if command in known_command: # Checks in command from user-input is in the dictionary.
+            possible_commands.append(f"'{known_command}'") # Appends the commands from the dictionary that the user maybe meant
 
-    if possible_commands:
-        console.print("Did you mean: ", style=ERR_CLR, end="")
+    if possible_commands: # Check that is not empty
+        console.print("Did you mean: ", style=ERR_CLR, end="") # Prints the possible commands from the possible commands list.
         if len(possible_commands) == 1:
             console.print(possible_commands[0], end="")
         elif len(possible_commands) == 2:
@@ -162,12 +177,13 @@ def error_command(command: str) -> None:
 
     console.print("Type 'help' for a list of commands.", end="\n\n")
 
+
 # Restarts the program using the python3 argument on current file. Might not work if you are using a different interpreter.
 def restart() -> None:
     for _ in track(range(10), description="Restarting..."):
-        sleep(0.2)
+        sleep(0.2) #Cool progressbar to show the user that the client is restarting.
 
-    # Restartes program with cool progressbar
+    # Restartes program.
     os.execv(sys.executable, ['python3'] + sys.argv)
 
 # Gets all champions from the server database, and prints them in a table with their name and stats.
@@ -180,8 +196,10 @@ def print_all_champions() -> None:
     table.add_column("Paper", justify="left", style=T_B_CLR)
     table.add_column("Scissors", justify="left", style=T_B_CLR)
 
-    champions_database: list = get_database_content("champions")
+    champions_database: list = get_database_content("champions") # Asks the server to fetch the champions from the
+    # champions database.
 
+    # Adds rows with the different percentages from the champion database
     for champion in champions_database:
         table.add_row(
             champion["name"].capitalize(),
@@ -194,31 +212,40 @@ def print_all_champions() -> None:
 
 # Sends what database the client needs, and the server returns the database
 def get_database_content(database_name: str) -> str:
+    # Uses the send_receive function to send a request to the server
+    # Server fetches the database
     database_content: list = send_recieve(f"get_database {database_name}")
-    return eval(database_content)
+    return eval(database_content) # Returns the database content, eval evaluates the 'string' as a python expression
 
 
-# TODO 3 Argument for playing against AI
 # Starts the game. First asks for name, then waits until two players are connected.
 def start_lobby() -> None:
     console.print("Welcome players, to Team Local Tactics!", style=TITLE)
     console.print("Press <Ctrl> + <C> to exit at any time during the champion selection.", style="underline", end="\n\n")
     for _ in track(range(10), description="Printing champions..."):
         sleep(0.5)
+
+    print()
+
     print_all_champions()
 
-    player_name: str = prompt.ask("Summoner, what is your name?") 
+    player_name: str = prompt.ask("Summoner, what is your name?") # Ask player for name input
 
     if player_name == "":
         player_name = f"Player {send_recieve('whoami')}"
 
     console.print(f"Welcome, {player_name}!")
     
+    # Waits while a second player connects to the lobby, if send_receive function recieves 'lobby found'
+    # by server, then the console.status stops and the start_game() is activated.
+    # A progressbar is initiated to prepare the players for the champion selection!
     with console.status("[bold green]Searching for a challenger...", spinner="earth") as status:
         if send_recieve(f"start_lobby {player_name}") == "lobby_found":
             status.stop()
-            for _ in track(range(10), description="Starting game..."):
+            for _ in track(range(10), description="Loading Champion Selection..."):
                 sleep(0.5)
+            print()
+
             start_game()
 
 
@@ -292,6 +319,9 @@ def end_game() -> None:
                     console.print("GG WP!")
         
 
+
+# Function which uses a socket to send all data with the command that is given to it
+# aswell as recieve the data that is sent to it.
 def send_recieve(command: str) -> str:
     sock.sendall(command.encode())
     return sock.recv(8024).decode()
@@ -323,8 +353,8 @@ commands = {
 }
 
 # What HOST and PORT the socket should connect to.
-#HOST: str = "" # Uncomment to run when not in docker
-HOST: str = "server" # Comment this if you uncomment the above
+HOST: str = "" # Uncomment to run when not in docker
+#HOST: str = "server" # Comment this if you uncomment the above
 PORT: int = 6666
 
 # If name is main run this.
@@ -332,12 +362,13 @@ if __name__ == "__main__":
     welcome_message()
 
     try:
-        sock: socket = create_connection((HOST, PORT))
-        help_database = get_database_content("help")
-    except ConnectionRefusedError:
+        sock: socket = create_connection((HOST, PORT)) # Creates a connection to the server
+        help_database = get_database_content("help")  # The help database is fetched immediately when client is connected
+    except ConnectionRefusedError: # If client could not connect to the server.
         console.print("Could not connect to the server.", style=ERR_CLR)
 
-    try:
+    try: # Splits the user input by a space to seperate the command and the argument the user gives
+        # For example: help start (help is the command, start is the argument)
         while (command := input(f"{PROMPT} ")):
             command: str; arg: str
             command, arg = (command + " ").split(" ", 1)

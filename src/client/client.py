@@ -342,14 +342,17 @@ commands = {
     "r": restart,
 }
 
-# What HOST and PORT the socket should connect to.
-HOST: str = "" # Uncomment to run when not in docker
-#HOST: str = "server" # Comment this if you uncomment the above
-PORT: int = 6666
-
 # If name is main run this.
 if __name__ == "__main__":
+    HOST: str; PORT: int
+
     welcome_message()
+
+    PORT = 6666
+    if "docker" in sys.argv:
+        HOST = "server"
+    else:
+        HOST = ""
 
     try:
         sock: socket = create_connection((HOST, PORT)) # Creates a connection to the server

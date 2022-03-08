@@ -19,6 +19,6 @@ services:
     image: tlt-client:latest
     build: src/client/
     hostname: client1
-    entrypoint: /client.py
+    entrypoint: /client.py docker
     depends_on:
      - server

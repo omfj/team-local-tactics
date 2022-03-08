@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from socket import socket, create_connection
+import sys
 from game_logic import Champion, Match, Team, Shape
 from datetime import datetime
 from threading import Thread
@@ -242,21 +243,20 @@ TXT_CONN: str = "bold green"
 TXT_DCON: str = "bold red"
 TXT_INFO: str = "bold yellow"
 
-# Self host and port
-HOST: str = "" # Uncomment to run when not in docker
-#HOST: str = "server" # Comment this if you uncomment the above
-PORT: int = 6666
-LISTEN: int = 2
-
-# Database host and port
-DB_HOST: str = "" # Uncomment to run when not in docker
-#DB_HOST: str = "database" # Comment this if you uncomment the above
-DB_PORT: int = 8888
-
 # Players and lobby
 lobby: list = []
 
 if __name__ == "__main__":
+    HOST: str; PORT: int; DB_HOST: str; DB_PORT: int
+    PORT = 6666
+    DB_PORT = 8888
+    if "docker" in sys.argv:
+        HOST = "server"
+        DB_HOST = "database"
+    else:
+        HOST = ""
+        DB_HOST = ""
+
     # Set up TCP socket
     sock = socket()
     sock.bind((HOST, PORT))

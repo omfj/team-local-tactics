@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from types import NoneType
 from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
@@ -66,19 +67,22 @@ def help_message(command_name="all") -> None:
 # all the details for a specific match by typing 'match <match_id>'
 def show_match_history(id: Optional[int or str]="all") -> None:
     match_history_database: list = get_database_content("match_history") #Gets the match history from the database
-    if id == "all":
-        match_history_overview(match_history_database)
-    elif id == "last":
-        match_history(match_history_database, -1)
-    else:
-        if id.isdigit():
-            id = int(id, 10)
-            try:
-                match_history(match_history_database, id)
-            except IndexError: #If user enters invalid Match ID. A match that hasn't been played yet.
-                console.print(f"Match does not exist. '{id}' is an invalid ID.", style=ERR_CLR)
+    try:
+        if id == "all":
+            match_history_overview(match_history_database)
+        elif id == "last":
+            match_history(match_history_database, -1)
         else:
-            console.print(f"Match does not exist. '{id}' is an invalid ID.", style=ERR_CLR)
+            if id.isdigit():
+                id = int(id, 10)
+                try:
+                    match_history(match_history_database, id)
+                except IndexError: #If user enters invalid Match ID. A match that hasn't been played yet.
+                    console.print(f"Match does not exist. '{id}' is an invalid ID.", style=ERR_CLR)
+            else:
+                console.print(f"Match does not exist. '{id}' is an invalid ID.", style=ERR_CLR)
+    except KeyError:
+        console.print("There are no matches in the match history.", style=ERR_CLR)
 
 # Display the match overview
 def match_history_overview(match_history_database: list) -> None:
@@ -103,6 +107,11 @@ def match_history(match_history_database: list, id: int):
     #player1_champs = players[0]["champions"]
     #player2_champs = players[1]["champions"]
 
+    # Get each players name
+    player1_name: str; player2_name: str
+    player1_name = players[0]["name"]
+    player2_name = players[1]["name"]
+        
     # Get each players score
     player1_score: str; player2_score: str
     player1_score = players[0]["score"]
@@ -116,15 +125,24 @@ def match_history(match_history_database: list, id: int):
         round_table = Table(title=f"Round {round}")
 
         for player in players:
-            round_table.add_column(player["name"], style=T_B_CLR)
+            round_table.add_column(player["name"].capitalize(), style=T_B_CLR)
 
         for desc in rounds[round]:
             player1_desc, player2_desc = desc.split(" vs ")
-            round_table.add_row(player1_desc, player2_desc)
+            round_table.add_row(player1_desc.capitalize(), player2_desc.capitalize())
             
 
         console.print(round_table)
         sleep(0.2)
+
+    print()
+
+    score_table = Table(title="Final score")
+    score_table.add_column("Name")
+    score_table.add_column("Score")
+    score_table.add_row(player1_name, f"{player1_score}")
+    score_table.add_row(player2_name, f"{player2_score}")
+    console.print(score_table)
 
     # Determine the winner
     if player1_score < player2_score:

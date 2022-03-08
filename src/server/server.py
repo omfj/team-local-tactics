@@ -53,7 +53,7 @@ def play_game() -> None:
             Team([parse_champion(champion) for champion in lobby[1][2]])
         )
         match.play()
-        send_match_summary(match, [player[1] for player in lobby])
+        send_match_summary(match, [player[1:] for player in lobby])
 
         for player in lobby:
             sleep(0.2) # Or else databse and server get overwhelmed
@@ -80,19 +80,26 @@ def send_match_summary(match: Match, players: list) -> None:
     date_time = now.strftime("%d/%m %H:%M")
 
     match_summary["time"] = date_time
-    match_summary["players"] = [player for player in players]
+
+    match_summary["players"] = []
+
+    for player in players:
+        name = player[0]
+        champions = player[1]
+        match_summary["players"].append({"name": name, "champions": [champion["name"] for champion in champions]})
+
+
     match_summary["score"] = [score for score in match.score]
     match_summary["rounds"] = {}
 
     for index, round in enumerate(match.rounds):
+        n_round = index + 1
+        match_summary["rounds"][f"{n_round}"] = []
 
-        # Create a table containing the results of the round
-        match_summary["rounds"][f"{index+1}"] = {}
-
-        for key in round:
-            red, blue = key.split(', ')
-            match_summary["rounds"][f"{index+1}"]["red"] = f"{red} {EMOJI[round[key].red]}"
-            match_summary["rounds"][f"{index+1}"]["blue"] = f"{blue} {EMOJI[round[key].blue]}"
+        for fight in round:
+            p1_champ, p2_champ = fight.split(', ')
+            current_fight: list = match_summary["rounds"][f"{n_round}"]
+            current_fight.append(f"{p1_champ} {EMOJI[round[fight].red]} vs {p2_champ} {EMOJI[round[fight].blue]}")
 
     console.log(f"Sending to database: append_database match_history {match_summary}")
     db_conn.sendall(f"append_database match_history {match_summary}".encode())
@@ -246,8 +253,8 @@ PORT: int = 6666
 LISTEN: int = 2
 
 # Database host and port
-#DB_HOST: str = "" # Uncomment to run when not in docker
-DB_HOST: str = "database" # Comment this if you uncomment the above
+DB_HOST: str = "" # Uncomment to run when not in docker
+#DB_HOST: str = "database" # Comment this if you uncomment the above
 DB_PORT: int = 8888
 
 # Players and lobby

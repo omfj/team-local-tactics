@@ -1,119 +1,23 @@
 - players:
-  - eirik
-  - ole magnus
+  - champions:
+    - twist
+    - guan
+    name: Player 1
+  - champions:
+    - vain
+    - asir
+    name: Player 2
   rounds:
     '1':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
+    - 'guan :raised_fist-emoji: vs asir :victory_hand-emoji:'
+    - 'twist :victory_hand-emoji: vs vain :raised_hand-emoji:'
     '2':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
+    - 'twist :raised_hand-emoji: vs asir :victory_hand-emoji:'
+    - 'guan :raised_fist-emoji: vs vain :raised_hand-emoji:'
     '3':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
+    - 'twist :raised_fist-emoji: vs asir :victory_hand-emoji:'
+    - 'guan :victory_hand-emoji: vs vain :raised_hand-emoji:'
   score:
-  - 5
-  - 1
-  time: some time
-- players:
-  - eirik
-  - ole magnus
-  rounds:
-    '1':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-    '2':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-    '3':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-  score:
-  - 5
-  - 1
-  time: some time
-- players:
-  - Player 1
-  - Player 2
-  rounds:
-    '1':
-      blue: 'twist :raised_hand-emoji:'
-      red: 'guan :raised_fist-emoji:'
-    '2':
-      blue: 'twist :victory_hand-emoji:'
-      red: 'vain :raised_hand-emoji:'
-    '3':
-      blue: 'twist :victory_hand-emoji:'
-      red: 'guan :raised_hand-emoji:'
-  score:
-  - 2
   - 4
-  time: 06/03 20:07
-- players:
-  - eirik
-  - ole magnus
-  rounds:
-    '1':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-    '2':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-    '3':
-      blue: 'guan :whale:'
-      red: 'vain :fire:'
-  score:
-  - 5
-  - 1
-  time: some time
-- players:
-  - Player 1
-  - Player 2
-  rounds:
-    '1':
-      blue: 'asir :victory_hand-emoji:'
-      red: 'vain :raised_hand-emoji:'
-    '2':
-      blue: 'katina :raised_hand-emoji:'
-      red: 'vain :raised_fist-emoji:'
-    '3':
-      blue: 'katina :victory_hand-emoji:'
-      red: 'cactus :raised_hand-emoji:'
-  score:
   - 2
-  - 4
-  time: 06/03 20:25
-- players:
-  - Player 1
-  - Player 2
-  rounds:
-    '1':
-      blue: 'cactus :raised_hand-emoji:'
-      red: 'vain :raised_fist-emoji:'
-    '2':
-      blue: 'cactus :raised_hand-emoji:'
-      red: 'siva :raised_fist-emoji:'
-    '3':
-      blue: 'cactus :raised_hand-emoji:'
-      red: 'vain :raised_fist-emoji:'
-  score:
-  - 1
-  - 5
-  time: 06/03 20:28
-- players:
-  - vain
-  - sda
-  rounds:
-    '1':
-      blue: 'siva :raised_fist-emoji:'
-      red: 'asir :victory_hand-emoji:'
-    '2':
-      blue: 'vain :victory_hand-emoji:'
-      red: 'guan :raised_hand-emoji:'
-    '3':
-      blue: 'siva :raised_fist-emoji:'
-      red: 'asir :victory_hand-emoji:'
-  score:
-  - 0
-  - 6
-  time: 06/03 20:29
+  time: 08/03 18:48

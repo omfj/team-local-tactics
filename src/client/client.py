@@ -326,7 +326,7 @@ def send_recieve(command: str) -> str:
     sock.sendall(command.encode())
     return sock.recv(8024).decode()
 
-# All the possible commands the user can use, and their methods
+# All the possible commands the user can use along with their aliases, and their methods
 commands = {
     # Start game TODO
     "start": start_lobby,

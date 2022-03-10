@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from socket import socket
+import sys
 from typing import Any
 from rich.console import Console
 from threading import Thread
@@ -71,15 +72,17 @@ commands: dict[str, Any] = {
     "append_database": append_database
 }
 
-# Host and port
-HOST: str = "" # Uncomment to run when not in docker
-#HOST: str = "database" # Comment this if you uncomment the above
-PORT: int = 8888
-
 # Rich
 console = Console()
 
 if __name__ == "__main__":
+    HOST: str; PORT: int
+    PORT = 8888
+    if "docker" in sys.argv:
+        HOST = "database"
+    else:
+        HOST = ""
+
     sock = socket()
     sock.bind((HOST, PORT))
     sock.listen()

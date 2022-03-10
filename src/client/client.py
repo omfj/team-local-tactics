@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from types import NoneType
 from rich.table import Table
 from rich.console import Console
 from rich.prompt import Prompt
@@ -66,19 +67,22 @@ def help_message(command_name="all") -> None:
 # all the details for a specific match by typing 'match <match_id>'
 def show_match_history(id: Optional[int or str]="all") -> None:
     match_history_database: list = get_database_content("match_history") #Gets the match history from the database
-    if id == "all":
-        match_history_overview(match_history_database)
-    elif id == "last":
-        match_history(match_history_database, -1)
-    else:
-        if id.isdigit():
-            id = int(id, 10)
-            try:
-                match_history(match_history_database, id)
-            except IndexError: #If user enters invalid Match ID. A match that hasn't been played yet.
-                console.print(f"Match does not exist. '{id}' is an invalid ID.", style=ERR_CLR)
+    try:
+        if id == "all":
+            match_history_overview(match_history_database)
+        elif id == "last":
+            match_history(match_history_database, -1)
         else:
-            console.print(f"Match does not exist. '{id}' is an invalid ID.", style=ERR_CLR)
+            if id.isdigit():
+                id = int(id, 10)
+                try:
+                    match_history(match_history_database, id)
+                except IndexError: #If user enters invalid Match ID. A match that hasn't been played yet.
+                    console.print(f"Match does not exist. '{id}' is an invalid ID.", style=ERR_CLR)
+            else:
+                console.print(f"Match does not exist. '{id}' is an invalid ID.", style=ERR_CLR)
+    except KeyError:
+        console.print("There are no matches in the match history.", style=ERR_CLR)
 
 # Display the match overview
 def match_history_overview(match_history_database: list) -> None:
@@ -94,68 +98,61 @@ def match_history(match_history_database: list, id: int):
 
     # Variables from the match_history dictionary
     # Sorted into variables, easier to handle
-    played: str = match["time"]
+    time: str = match["time"]
     players: list = match["players"]
-    score: list = match["score"]
-    players_score: list = list(zip(players, score)) # Format ([name, score], ...)
     rounds: dict = match["rounds"]
 
+    # List of each players champions
+    #player1_champs: list; player2_champs: list
+    #player1_champs = players[0]["champions"]
+    #player2_champs = players[1]["champions"]
 
-    console.print(f"Match ID {id}")
-    console.print(' vs. '.join([f"'{player.capitalize()}'" for player in players])) #Prints the players who played eachother
-    console.print(f"Played at: {played}", end="\n\n") #Prints the time they played at
-
-    # Prints a rich table of all the rounds and which champion played against who, aswell as who won.
-    teams_list = []
-    champs_list = []
-    round_table = Table(title="The Match", header_style=T_H_CLR)
-    for round in rounds:
-        round_table.add_column(f"Round {round}", justify="left", style=T_B_CLR)
-        for team, champs in rounds[round].items():
-            teams_list.append(team)
-            champs_list.append(champs)
-            round_table.add_row(f"{team.capitalize()} - {champs.capitalize()}")
-    #console.print(round_table)
-    #console.print(teams_list)
-    #console.print(champs_list)
-
-    # Prints a table of the final score of the players, aswell with a little message to the user.
-    player_scores = Table(title="Final Score", header_style=INF_CLR)
-    for player_stats in players_score:
-        player_scores.add_column(f"{player_stats[0]}: {player_stats[1]}")
-    
-    if players_score[0][1] > players_score[1][1]: #If player 1 won and player 2 lost.
-        player_scores.add_row("Well played, Summoner!", "Better luck next time, kiddo.")
-    elif players_score[0][1] < players_score[1][1]: #If player 2 won and player 1 lost.
-        player_scores.add_row("Better luck next time, kiddo.", "Well played, Summoner!")
-    else: #If it is a draw
-        player_scores.add_row("You are Even Steven.", "You are Even Steven.")
+    # Get each players name
+    player1_name: str; player2_name: str
+    player1_name = players[0]["name"]
+    player2_name = players[1]["name"]
         
-    console.print(player_scores)
+    # Get each players score
+    player1_score: str; player2_score: str
+    player1_score = players[0]["score"]
+    player2_score = players[1]["score"]
+
+    console.print(' vs. '.join([f"'{player['name'].capitalize()}'" for player in players]))
+    console.print(f"Played at: {time}", end="\n\n")
+
+    # Make one table for each round. The tables includes the info about that round
+    for round in rounds:
+        round_table = Table(title=f"Round {round}")
+
+        for player in players:
+            round_table.add_column(player["name"].capitalize(), style=T_B_CLR)
+
+        for desc in rounds[round]:
+            player1_desc, player2_desc = desc.split(" vs ")
+            round_table.add_row(player1_desc.capitalize(), player2_desc.capitalize())
+            
+
+        console.print(round_table)
+        sleep(0.2)
+
     print()
-    # Print out the rounds
-    #for round in rounds:
-        #console.print(f"Round {round}")
-        #for team, champs in rounds[round].items():
-            #console.print(f"{team} - {champs}")
 
-    #print()
-    # Determines the winner. Prints 'GG EZ' if either player managed to get zero points.
-    if players_score[0][1] == 6:
-        console.print(f"Winner: {players_score[0][0].capitalize()}! GG EZ")
-    elif players_score[1][1] == 6:
-        console.print(f"Winner: {players_score[1][0].capitalize()}! GG EZ")
-    elif players_score[0][1] > players_score[1][1]:
-        console.print(f"Winner: {players_score[0][0].capitalize()}! GG WP")
-    elif players_score[1][1] > players_score[0][1]:
-        console.print(f"Winner: {players_score[1][0].capitalize()}! GG WP")
+    score_table = Table(title="Final score")
+    score_table.add_column("Name")
+    score_table.add_column("Score")
+    score_table.add_row(player1_name, f"{player1_score}")
+    score_table.add_row(player2_name, f"{player2_score}")
+    console.print(score_table)
+
+    # Determine the winner
+    if player1_score < player2_score:
+        console.print(f"{players[1]['name']} won the game!")
+    elif player2_score < player1_score:
+        console.print(f"{players[0]['name']} won the game!")
     else:
-        console.print(f"It was a tie! GG WP")
-
-    
+        console.print(f"It was a tie!")
 
 # If the command is not recognized, print an error message. Also try to find what command the user meant.
-
 def error_command(command: str) -> None:
     console.print(f"Unknown command: '{command}'.", style=ERR_CLR)
 
@@ -224,9 +221,6 @@ def start_lobby() -> None:
     console.print("Press <Ctrl> + <C> to exit at any time during the champion selection.", style="underline", end="\n\n")
     for _ in track(range(10), description="Printing champions..."):
         sleep(0.5)
-
-    print()
-
     print_all_champions()
 
     player_name: str = prompt.ask("Summoner, what is your name?") # Ask player for name input
@@ -242,10 +236,6 @@ def start_lobby() -> None:
     with console.status("[bold green]Searching for a challenger...", spinner="earth") as status:
         if send_recieve(f"start_lobby {player_name}") == "lobby_found":
             status.stop()
-            for _ in track(range(10), description="Loading Champion Selection..."):
-                sleep(0.5)
-            print()
-
             start_game()
 
 
@@ -352,14 +342,17 @@ commands = {
     "r": restart,
 }
 
-# What HOST and PORT the socket should connect to.
-HOST: str = "" # Uncomment to run when not in docker
-#HOST: str = "server" # Comment this if you uncomment the above
-PORT: int = 6666
-
 # If name is main run this.
 if __name__ == "__main__":
+    HOST: str; PORT: int
+
     welcome_message()
+
+    PORT = 6666
+    if "docker" in sys.argv:
+        HOST = "server"
+    else:
+        HOST = ""
 
     try:
         sock: socket = create_connection((HOST, PORT)) # Creates a connection to the server

@@ -240,6 +240,8 @@ def start_lobby() -> None:
 
 
 
+# A function which makes sure that the different players does not pick the
+# the same champion and that they don't pick a champion that doesn't exist.
 def validate_champion(prompt: str) -> None:
     all_champions: list = get_database_content("champions")
 
@@ -248,7 +250,7 @@ def validate_champion(prompt: str) -> None:
     other_champions: list = eval(send_recieve("filter_champs other"))
     other_champions: list = reduce(concat, other_champions)
 
-    while True:
+    while True: # While loop which validates the champions that are picked.
         name: str = Prompt.ask(f"[bold yellow]{prompt}").lower()
         match name:
             case name if name not in [champion["name"] for champion in all_champions]:
@@ -263,7 +265,9 @@ def validate_champion(prompt: str) -> None:
                         sock.sendall(f"add_champion {champion}".encode())
                 break
 
-
+# Simple function which dictates which player's turn it is to pick a champion.
+# Once player 1 has picked, player 2 may pick and champions, and so it goes until
+# amount of champions picked have reached 4.
 def get_turn() -> int:
     sleep(0.1)
     n_picked: int = int(send_recieve("total_picked"))
@@ -271,10 +275,11 @@ def get_turn() -> int:
     player_id: int = int(send_recieve("whoami"))
     return (picks_left + (player_id)) % 2
 
-
+# Function which starts the game and initiates champions selection.
 def start_game() -> None:
     console.print("Contestant found!", style="green")
     console.print(f"Playing against: {send_recieve('get_opponent_names')}", style="bold red")
+    # Recieves opponent name from the server and displays it.
     
     pick: list[str] = ["first", "second"]
     n: int = 0
@@ -282,11 +287,11 @@ def start_game() -> None:
     with console.status("[green]Your opponent is picking a champion...") as status:
         while n < 2:
             status.start()
-            turn: int = get_turn() 
+            turn: int = get_turn() # Controls that both players do not pick champion at the same time
             match turn:
                 case 0:
                     status.stop()
-                    validate_champion(f"Pick your {pick[n]} champion")
+                    validate_champion(f"Pick your {pick[n]} champion") # Validates the champions picked
                     n += 1
                 case 1:
                     sleep(0.5)
@@ -294,18 +299,22 @@ def start_game() -> None:
             end_game()
 
 
+# A function which prints the ongoing champions selection
+# and while the players are playing the game. Lastly,
+# when the game has endend, show the latest addition to the match history
+# which displays the results of the match.
 def end_game() -> None:
     with console.status("[green]Your opponent is picking a champion...") as status:
-        while int(send_recieve("total_picked")) < 4:
+        while int(send_recieve("total_picked")) < 4: # As long as the amount of champions picked are below 4, continue champion selection
             sleep(1)
         else:
-            status.stop()
+            status.stop() # When there are 4 champions picked, stop champion selection.
             with console.status("[bold green]Playing the game...") as status:
-                while sock.recv(1024).decode() != "game_end":
+                while sock.recv(1024).decode() != "game_end": # Plays the game as long as the server hasn't ended the game
                         sleep(1)
                 else:
                     status.stop()
-                    show_match_history("last")
+                    show_match_history("last") # Displays the game results
                     console.print("GG WP!")
         
 

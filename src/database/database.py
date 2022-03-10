@@ -20,10 +20,10 @@ def read_database(conn: socket, address: tuple, args: any) -> None:
 
     console.log(f"{address} asked for the database '{database_name}'", style=TXT_INFO)
     with open(f"{database_name}.yaml", "r") as f:
-        database_content: list = yaml.load(f, Loader=yaml.FullLoader)
+        database_content: list = yaml.load(f, Loader=yaml.FullLoader) # loads the yaml file into a list.
     f.close()
-    database_content: str = str(database_content)
-    conn.sendall(database_content.encode())
+    database_content: str = str(database_content) # Changes the list into a string
+    conn.sendall(database_content.encode()) # Sends the database content as a string to the server connection
 
 # Append the content to the database
 def append_database(_: any, address: tuple, args: any) -> None:
@@ -32,7 +32,8 @@ def append_database(_: any, address: tuple, args: any) -> None:
 
     console.log(f"{address} appended {content} to the database '{database_name}'", style=TXT_INFO)
     with open(f"{database_name}.yaml", "a") as f:
-        yaml.dump([eval(content)], f, default_flow_style=False, allow_unicode=True)
+        yaml.dump([eval(content)], f, default_flow_style=False, allow_unicode=True) # 'Dumps' the information the database has
+        # received into the yaml file.
     f.close()
 
 ##### SOCKET LOGIC #####
@@ -83,7 +84,7 @@ if __name__ == "__main__":
     else:
         HOST = ""
 
-    sock = socket()
+    sock = socket() # sets up a socket connection with the server
     sock.bind((HOST, PORT))
     sock.listen()
 

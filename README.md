@@ -25,6 +25,12 @@ git clone https://github.com/omfj/team-local-tactics.git
 cd team-local-tactics
 ```
 
+When running it locally, make sure that the scripts folder is its root folder.
+Run in this order:
+1. Database
+2. Server
+3. Clients
+
 ### Docker
 1. Buld and run the database and server detached
 ```bash

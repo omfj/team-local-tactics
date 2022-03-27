@@ -361,7 +361,7 @@ if __name__ == "__main__":
     if "docker" in sys.argv:
         HOST = "server"
     else:
-        HOST = ""
+        HOST = "localhost"
 
     try:
         sock: socket = create_connection((HOST, PORT)) # Creates a connection to the server

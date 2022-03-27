@@ -82,7 +82,7 @@ if __name__ == "__main__":
     if "docker" in sys.argv:
         HOST = "database"
     else:
-        HOST = ""
+        HOST = "localhost"
 
     sock = socket() # sets up a socket connection with the server
     sock.bind((HOST, PORT))

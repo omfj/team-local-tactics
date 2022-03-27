@@ -268,8 +268,8 @@ if __name__ == "__main__":
         HOST = "server"
         DB_HOST = "database"
     else:
-        HOST = ""
-        DB_HOST = ""
+        HOST = "localhost"
+        DB_HOST = "localhost"
 
     # Set up TCP socket
     sock = socket()

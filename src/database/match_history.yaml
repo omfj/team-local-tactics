@@ -1,0 +1,22 @@
+- players:
+  - champions:
+    - asir
+    - cactus
+    name: olemagnus
+    score: 0
+  - champions:
+    - guan
+    - luanne
+    name: henrik
+    score: 6
+  rounds:
+    '1':
+    - 'cactus :victory_hand-emoji: vs luanne :raised_fist-emoji:'
+    - 'asir :victory_hand-emoji: vs guan :raised_fist-emoji:'
+    '2':
+    - 'cactus :raised_hand-emoji: vs guan :victory_hand-emoji:'
+    - 'asir :victory_hand-emoji: vs luanne :raised_fist-emoji:'
+    '3':
+    - 'asir :victory_hand-emoji: vs luanne :raised_fist-emoji:'
+    - 'cactus :raised_hand-emoji: vs guan :victory_hand-emoji:'
+  time: 28/03 01:36
